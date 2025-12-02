@@ -1,0 +1,12 @@
+export const CATEGROIES = [ 'Adventure',
+                            'Cyberpunk',
+                            'Drama',
+                            'Fantasy',
+                            'Historical Fiction',
+                            'Horror',
+                            'Inspirational',
+                            'Mystery',
+                            'Post-Apocalyptic',
+                            'Romance',
+                            'Science Fiction',
+                            'Thriller']

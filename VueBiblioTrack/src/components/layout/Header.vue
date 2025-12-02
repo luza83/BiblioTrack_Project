@@ -1,0 +1,117 @@
+<template>
+    <nav class="navbar navbar-expand-md rounded-3 mx-auto my-2 w-100 bg-primary-subtle bg-opacity-10 text-primary-subtle">
+        <div class="container-fluid">
+            <router-link class="navbar-brand" :to="APP_ROUTE_NAMES.HOME">
+                <img src="@/assets/logo.png" alt="Logo" height="64px" class="d-inline-block align-text-top me-2">
+            </router-link>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <router-link 
+                            class="nav-link active" 
+                            aria-current="page" 
+                            :to="APP_ROUTE_NAMES.HOME">Home
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                       <a class="nav-link" href="#">Borrow</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Admin
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>             
+                            <router-link 
+                                class="nav-link" 
+                                aria-current="page"
+                                :to="{name: APP_ROUTE_NAMES.BOOKS}">Books
+                            </router-link>
+                        </li>
+                        <li>
+                             <router-link 
+                                class="nav-link" 
+                                aria-current="page"
+                                :to="{name: APP_ROUTE_NAMES.BOOK_COPIES}">Book Copies
+                            </router-link>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </li>
+                    </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center small">
+                <li class="nav-item" >
+                    <router-link
+                    class="nav-link"
+                    aria-current="page"
+                    :to="{ name: APP_ROUTE_NAMES.SIGN_IN }"
+                    title="Sign In"
+                    ><i class="bi bi-box-arrow-in-right"></i></router-link
+                    >
+                </li>
+                <li class="nav-item" >
+                    <router-link
+                    class="nav-link"
+                    aria-current="page"
+                    :to="{ name: APP_ROUTE_NAMES.SIGN_UP }"
+                    title="Sign Up"
+                    ><i class="bi bi-person-add"></i></router-link
+                    >
+                </li>
+                <li class="nav-item" >
+                    <button class="nav-link px-2" aria-current="page" title="Logout" >
+                    <i class="bi bi-door-open"></i>
+                    </button>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a
+                    class="nav-link dropdown-toggle"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    >
+                    <i class="bi bi-laptop"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                    <li>
+                        <button
+                        class="dropdown-item"
+                        aria-current="page"
+                        @click="themeStore.setTheme('light')"
+                        >
+                        <i class="bi bi-sun"></i> Light
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                        class="dropdown-item"
+                        aria-current="page"
+                        @click="themeStore.setTheme('dark')"
+                        >
+                        <i class="bi bi-moon-fill"></i> Dark
+                        </button>
+                    </li>
+                    </ul>
+                </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</template>
+<script setup>
+import { APP_ROUTE_NAMES } from '@/constants/routeNames'
+import { useThemeStore } from '@/stores/themeStore'
+// import { useAuthStore } from '@/stores/authStore'
+
+// const authStore = useAuthStore()
+const themeStore = useThemeStore()
+
+</script>
