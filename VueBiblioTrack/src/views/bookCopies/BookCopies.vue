@@ -29,8 +29,7 @@
               <thead>
                 <tr>
                   <th class="ps-3 small text-muted">Title</th>
-                  <th class="small text-muted">Author</th>
-                  <th class="small text-muted">Publisher</th>
+                  <th class="small text-muted">Author</th>  
                   <th class="small text-muted">Copies</th>
                 </tr>
               </thead>
@@ -50,8 +49,7 @@
                     </div>
                   </td>
                   <td class="fw-semibold small">{{ book.author }}</td>
-                  <td class="fw-semibold small">{{ book.publisher }}</td>
-                  <td class="fw-semibold small">{{ getTotalCopies(book.bookId) }}</td>
+                  <td class="fw-semibold small">{{ book.totalCopies }}</td>
                 </tr>
               </tbody>
             </table>
@@ -77,7 +75,7 @@ const fetchBooks = async () => {
   books.length = 0
   loading.value = true
   try {
-    var result = await booksService.getBooks()
+    var result = await bookCopyService.getBooks()
     books.push(...result)
   } catch (error) {
     console.log('Error fetch menu items:', error)
