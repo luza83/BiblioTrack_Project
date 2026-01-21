@@ -63,7 +63,7 @@
                   class="form-control"
                   placeholder="Enter book author"
                   v-model="bookObj.author"
-                ></input>
+                  />
               </div>
 
               <div class="mb-3">
@@ -137,7 +137,6 @@ const isProcessing = ref(false)
 const errorList = reactive([])
 const newUploadedImage = ref(null)
 const newUploadedImage_base64 = ref('')
-console.log('route params:', route.params)
 const bookIdForUpdate = route.params.bookId
 const bookObj = reactive({
   title: '',

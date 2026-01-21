@@ -15,7 +15,7 @@ export default {
       throw error
     }
   },
-  async getBookCopies() {
+  async getBookCopies(bookId) {
     try {
       const response = await api.get(`/bookCopies/copies/${bookId}`)
 

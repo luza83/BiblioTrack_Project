@@ -35,7 +35,7 @@
                              <router-link 
                                 class="nav-link" 
                                 aria-current="page"
-                                :to="{name: APP_ROUTE_NAMES.BOOK_COPIES}">Book Copies
+                                :to="{name: APP_ROUTE_NAMES.BOOK_STOCK}">Book Stock
                             </router-link>
                         </li>
                         <li><hr class="dropdown-divider"></li>
