@@ -71,10 +71,10 @@ export default {
       throw error
     }
   },
-  async deleteBookCopy(copyId) {
+  async deleteBookCopy(bookCopyId) {
     try {
-      const response = await api.delete(`/bookCopies?copyId=${copyId}`)
-
+      const response = await api.delete(`/bookCopies?bookCopyId=${bookCopyId}`)
+      
       if (response.data.isSuccess) {
         return response.data.result
       } else {

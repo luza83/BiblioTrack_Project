@@ -8,7 +8,6 @@ import Books from '@/views/books/Books.vue'
 import BookUpsert from '@/views/books/BookUpsert.vue'
 import BookStock from '@/views/bookCopies/BookStock.vue'
 import BookCopies from '@/views/bookCopies/BookCopies.vue'
-import BookCopyUpsert from '@/views/bookCopies/BookCopyUpsert.vue'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 
 const router = createRouter({
@@ -62,19 +61,7 @@ const router = createRouter({
       name: APP_ROUTE_NAMES.BOOK_COPIES,
       component: BookCopies,
     },
-    // {
-    //   path: '/admin/manage-book-copies/create',
-    //   name: APP_ROUTE_NAMES.CREATE_BOOK_COPY,
-    //   component: BookCopyUpsert,
-    //   // beforeEnter: [requireAdmin],
-    // },
-    // {
-    //   path: '/admin/manage-book-copies/update/:bookCopyId',
-    //   name: APP_ROUTE_NAMES.EDIT_BOOK_COPY,
-    //   component: BookCopyUpsert,
-    //   props: true,
-    //   // beforeEnter: [requireAdmin],
-    // },
+
     {
       path: '/:catchAll(.*)*',
       name: APP_ROUTE_NAMES.NOT_FOUND,

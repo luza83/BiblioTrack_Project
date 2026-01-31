@@ -93,7 +93,7 @@ onMounted(fetchBooks)
 const handleBookDelete = async (bookId) => {
   try {
     const confirmResult = await showConfirm('Are you sure you want to delete this Book?')
-    console.log(confirmResult)
+    
     if (confirmResult.isConfirmed) {
       loading.value = true
       await booksService.deleteBook(bookId)

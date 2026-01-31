@@ -25,7 +25,7 @@
           </div>
           <button
             class="btn btn-primary-subtle btn-sm gap-2 rounded-1 px-4 py-2"
-            @click="router.push({ name: APP_ROUTE_NAMES.CREATE_BOOK_COPY })"
+            @click="viewBookCopyDetails(copy)"
           >
             <i class="bi bi-plus-square"></i> &nbsp;
             <span>Add Book Copy</span>
@@ -75,6 +75,7 @@
     </div>
     <BookCopyUpsertModal
       :bookCopy="selectedBookCopy"
+      :bookId="bookId"
       @close="closeBookCopyModal"
       @status-updated="fetchBookCopies"
     ></BookCopyUpsertModal>
@@ -103,7 +104,7 @@ const loading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const selectedBookCopy = ref(null);
-console.log("Params:", route.params);
+
 const bookId = route.params.bookId;
 const fetchBookAndCopies = async () => {
   loading.value = true
@@ -134,6 +135,7 @@ const fetchBookCopies = async () => {
 const viewBookCopyDetails = (bookCopy) => {
   selectedBookCopy.value = { ...bookCopy }
 }
+
 
 const closeBookCopyModal = () => {
   selectedBookCopy.value = null

@@ -9,7 +9,8 @@
                     <div
                         class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-2">
                         <div class="d-flex align-items-center">
-                            <h5 class="mb-0 fs-5 text-primary-subtle">Copy #{{ bookCopy.copyId }}</h5>
+                            <h5 v-if="bookCopy.copyId" class="mb-0 fs-5 text-primary-subtle">Copy #{{ bookCopy.copyId }}</h5>
+                            <h5 v-else class="mb-0 fs-5 text-primary-subtle">New Book Copy</h5>
                         </div>
                         <button @click="closeModal" class="btn-close ms-auto ms-sm-0" aria-label="Close modal"></button>
                     </div>
@@ -17,9 +18,9 @@
                     <div
                         class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
                         <span class="badge rounded-pill px-3 py-2" :class="{
-                            'bg-warning-subtle text-warning-emphasis': bookCopy.status === COPY_STATUS_AVAILABLE,
-                            'bg-info-subtle text-info-emphasis': bookCopy.status === COPY_STATUS_RESERVED,
-                            'bg-success-subtle text-success-emphasis': bookCopy.status === COPY_STATUS_BORROWED,
+                            'bg-success-subtle text-success-emphasis': bookCopy.status === COPY_STATUS_AVAILABLE,
+                            'bg-warning-subtle text-warning-emphasis': bookCopy.status === COPY_STATUS_RESERVED,
+                            'bg-warning-subtle text-warning-emphasis': bookCopy.status === COPY_STATUS_BORROWED,
                             'bg-danger-subtle text-danger-emphasis': bookCopy.status === COPY_STATUS_LOST,
                             'bg-danger-subtle text-danger-emphasis': bookCopy.status === COPY_STATUS_DAMAGED,
                         }">
@@ -41,7 +42,7 @@
                                     <!-- Location Input -->
                                     <div class="mb-3">
                                         <input id="locationInput" type="text" class="form-control"
-                                            v-model="bookCopy.location" />
+                                            v-model="copyObj.location" />
                                     </div>
 
                                 </div>
@@ -61,7 +62,7 @@
                             <!-- Status Flow Buttons -->
                             <div class="mb-3">
                                 <label for="statusSelect" class="form-label">Status</label>
-                                <select id="statusSelect" class="form-select" v-model="bookCopy.status">
+                                <select id="statusSelect" class="form-select" v-model="copyObj.status">
                                     <option disabled value="">Select status</option>
                                     <option v-for="status in statuses" :key="status" :value="status">
                                         {{ status }}
@@ -78,18 +79,30 @@
                         type="button" 
                         class="btn btn-secondary" 
                         data-bs-dismiss="modal"
+                        @click="closeModal"
                     >
                         Cancel
                     </button>
 
                     <!-- Update Button -->
-                    <button 
+                    <div v-if="bookCopy.copyId">
+                      <button 
                         type="button" 
                         class="btn btn-primary"
-                        @click="updateBookCopy(bookCopy)"
-                    >
+                        @click="updateBookCopy()"
+                      >
                         Update
-                    </button>
+                      </button>
+                    </div>
+                    <div v-else>
+                       <button 
+                        type="button" 
+                        class="btn btn-primary"
+                        @click="addBookCopy(bookId)"
+                      >
+                        Add Copy
+                      </button>
+                    </div>
                 </div>
 
             </div>
@@ -98,7 +111,6 @@
 </template>
 
 <script setup>
-import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import {
   COPY_STATUS,
     COPY_STATUS_AVAILABLE,
@@ -109,8 +121,14 @@ import {
 } from '@/constants/constants'
 import bookCopyService from '@/services/bookCopyService.js'
 import { useSwal } from '@/composables/swal'
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 const { showSuccess } = useSwal()
+
+const copyObj = reactive({
+  status: '',
+  location: '',
+})
+
 const props = defineProps({
   bookCopy: {
     type: Object,
@@ -122,31 +140,77 @@ const props = defineProps({
       location: '',
     }),
   },
+   bookId: {
+      type: [Number, String],
+      required: true
+    }
 })
+
+watch(
+  () => props.bookCopy,
+  (newVal) => {
+    if (!newVal) return
+
+    copyObj.status = newVal.status
+    copyObj.location = newVal.location
+  },
+  { immediate: true }
+)
+
 const emit = defineEmits(['close', 'status-updated'])
 const closeModal = () => {
   emit('close')
 }
 
 
-const bookCopyObj = reactive({
-  Status: '',
-  Location: ''
-})
+const updateBookCopy = async () => {
+  if (!props.bookCopy) return
+  
+  const payload = {}
 
+  if (copyObj.status !== props.bookCopy.status) {
+    payload.status = copyObj.status
+  }
 
-const updateBookCopy = async (bookCopy) => {
+  if (copyObj.location !== props.bookCopy.location) {
+    payload.location = copyObj.location
+  }
+
+  if (Object.keys(payload).length === 0) {
+    // nothing changed
+    closeModal()
+    return
+  }
   try {
-    bookCopyObj.Status = bookCopy.status
-    bookCopyObj.Location = bookCopy.location
 
-    await bookCopyService.updateBookCopy(bookCopy.copyId, bookCopyObj)
+    await bookCopyService.updateBookCopy(props.bookCopy.copyId, payload)
 
     showSuccess('Book copy updated successfully')
     closeModal()
     emit('status-updated')
   } catch (error) {
     console.error('Error updating book copy', error)
+  }
+}
+
+const addBookCopy = async (bookId) => {
+  if (!props.bookCopy) return
+
+  const payload = {
+    bookId: bookId,
+    status: copyObj.status,
+    location: copyObj.location,
+  }
+
+  try {
+
+    await bookCopyService.addBookCopy(payload)
+
+    showSuccess('Book copy added successfully')
+    closeModal()
+    emit('status-updated')
+  } catch (error) {
+    console.error('Error adding book copy', error)
   }
 }
 
