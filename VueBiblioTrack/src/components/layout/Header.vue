@@ -40,7 +40,11 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <router-link 
+                                class="nav-link" 
+                                aria-current="page"
+                                :to="{name: APP_ROUTE_NAMES.USERS}">Users
+                            </router-link>
                         </li>
                     </ul>
                     </li>
