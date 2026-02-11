@@ -17,7 +17,11 @@
                         </router-link>
                     </li>
                     <li class="nav-item">
-                       <a class="nav-link" href="#">Borrow</a>
+                       <router-link 
+                            class="nav-link" 
+                            aria-current="page" 
+                            :to="{name: APP_ROUTE_NAMES.BORROW_BOOK}">Borrow
+                        </router-link>
                     </li>
                     <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

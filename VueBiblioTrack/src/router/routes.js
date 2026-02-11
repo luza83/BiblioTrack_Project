@@ -9,6 +9,7 @@ import BookUpsert from '@/views/books/BookUpsert.vue'
 import BookStock from '@/views/bookCopies/BookStock.vue'
 import BookCopies from '@/views/bookCopies/BookCopies.vue'
 import Users from '@/views/users/Users.vue'
+import Borrow from '@/views/borrows/Borrow.vue'
 import { requireAuth } from '@/router/guards'
 import { requireAdmin } from '@/router/guards'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
@@ -74,6 +75,13 @@ const router = createRouter({
       component: Users,
       beforeEnter: [requireAdmin],
     },
+    {
+      path: '/borrow-book',
+      name: APP_ROUTE_NAMES.BORROW_BOOK,
+      component: Borrow,
+      beforeEnter: [requireAuth],
+    },
+    
     {
       path: '/:catchAll(.*)*',
       name: APP_ROUTE_NAMES.NOT_FOUND,
