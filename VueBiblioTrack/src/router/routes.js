@@ -9,7 +9,10 @@ import BookUpsert from '@/views/books/BookUpsert.vue'
 import BookStock from '@/views/bookCopies/BookStock.vue'
 import BookCopies from '@/views/bookCopies/BookCopies.vue'
 import Users from '@/views/users/Users.vue'
+import { requireAuth } from '@/router/guards'
+import { requireAdmin } from '@/router/guards'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,34 +41,38 @@ const router = createRouter({
       path: '/admin/manage-books',
       name: APP_ROUTE_NAMES.BOOKS,
       component: Books,
+      beforeEnter: [requireAdmin],
     },
     {
       path: '/admin/manage-books/create',
       name: APP_ROUTE_NAMES.CREATE_BOOK,
       component: BookUpsert,
-      // beforeEnter: [requireAdmin],
+      beforeEnter: [requireAdmin],
     },
     {
       path: '/admin/manage-books/update/:bookId',
       name: APP_ROUTE_NAMES.EDIT_BOOK,
       component: BookUpsert,
       props: true,
-      // beforeEnter: [requireAdmin],
+      beforeEnter: [requireAdmin],
     },
     {
       path: '/admin/manage-book-stock',
       name: APP_ROUTE_NAMES.BOOK_STOCK,
       component: BookStock,
+      beforeEnter: [requireAdmin],
     },
     {
       path: '/admin/manage-book-copies/:bookId',
       name: APP_ROUTE_NAMES.BOOK_COPIES,
       component: BookCopies,
+      beforeEnter: [requireAdmin],
     },
     {
       path: '/admin/manage-users',
       name: APP_ROUTE_NAMES.USERS,
-      component: Users
+      component: Users,
+      beforeEnter: [requireAdmin],
     },
     {
       path: '/:catchAll(.*)*',

@@ -24,3 +24,5 @@ export const COPY_STATUS = [
     COPY_STATUS_LOST,
     COPY_STATUS_DAMAGED
 ]
+
+export const ROLES = ['Admin', 'Visitor']

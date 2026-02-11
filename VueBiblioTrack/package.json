@@ -17,6 +17,7 @@
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.13.1",
     "i": "^0.3.7",
+    "js-cookie": "^3.0.5",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.7.1",
     "sweetalert2": "^11.26.3",

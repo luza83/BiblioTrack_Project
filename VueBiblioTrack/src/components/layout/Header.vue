@@ -50,27 +50,27 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center small">
-                <li class="nav-item" >
+                <li class="nav-item" v-if="!authStore.isAuthenticated" >
                     <router-link
                     class="nav-link"
                     aria-current="page"
                     :to="{ name: APP_ROUTE_NAMES.SIGN_IN }"
                     title="Sign In"
-                    ><i class="bi bi-box-arrow-in-right"></i></router-link
+                    >Sign In</router-link
                     >
                 </li>
-                <li class="nav-item" >
+                <li class="nav-item" v-if="!authStore.isAuthenticated" >
                     <router-link
                     class="nav-link"
                     aria-current="page"
                     :to="{ name: APP_ROUTE_NAMES.SIGN_UP }"
                     title="Sign Up"
-                    ><i class="bi bi-person-add"></i></router-link
+                    >Sign Up</router-link
                     >
                 </li>
-                <li class="nav-item" >
-                    <button class="nav-link px-2" aria-current="page" title="Logout" >
-                    <i class="bi bi-door-open"></i>
+                <li class="nav-item"  v-if="authStore.isAuthenticated" >
+                    <button class="nav-link px-2" aria-current="page" title="Logout" @click="authStore.signOut()">
+                    Sign Out
                     </button>
                 </li>
 
@@ -113,9 +113,9 @@
 <script setup>
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import { useThemeStore } from '@/stores/themeStore'
-// import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore } from '@/stores/authStore'
 
-// const authStore = useAuthStore()
+const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
 </script>
