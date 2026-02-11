@@ -1,9 +1,9 @@
 import api from '@/services/api'
 
 export default {
-    async getBooks() {
+  async getBooks(getAvailableOnly = false) {
     try {
-      const response = await api.get('/bookCopies')
+      const response = await api.get(`/bookCopies${getAvailableOnly ? '?getAvailableOnly=true' : ''}`)
 
       if (response.data.isSuccess) {
         return response.data.result
@@ -15,6 +15,7 @@ export default {
       throw error
     }
   },
+
   async getBookCopies(bookId) {
     try {
       const response = await api.get(`/bookCopies/copies/${bookId}`)
