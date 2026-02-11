@@ -64,7 +64,6 @@
   </div>
 </template>
 <script setup>
-import booksService from '@/services/booksService.js'
 import bookCopyService from '@/services/bookCopyService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
@@ -90,20 +89,5 @@ const fetchBooks = async () => {
 
 onMounted(fetchBooks)
 
-const handleBookDelete = async (bookId) => {
-  try {
-    const confirmResult = await showConfirm('Are you sure you want to delete this Book?')
-    
-    if (confirmResult.isConfirmed) {
-      loading.value = true
-      await booksService.deleteBook(bookId)
-      showSuccess('Book deletd sccucessfully')
-      fetchBooks()
-    }
-  } catch (error) {
-    console.log('Error deleting book:', error)
-  } finally {
-    loading.value = false
-  }
-}
+
 </script>

@@ -56,7 +56,7 @@
                         class="btn btn-sm btn-outline-primary-subtle"
                        
                       >
-                        <i class="bi bi-pencil-square"></i>
+                        <i class="bi bi-bookmark-plus" title="Borrow this book"></i>
                       </button>
                     </div>
                   </td>
