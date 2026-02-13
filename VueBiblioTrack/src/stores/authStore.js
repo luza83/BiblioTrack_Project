@@ -25,6 +25,9 @@ export const useAuthStore = defineStore('authStore', () => {
     return isAuthenticated.value && user.role === 'Admin'
   })
 
+  const currentUserId = computed(() => {
+    return isAuthenticated.value ? user.id : null
+  })
   function decodeToken(token) {
     const payload = JSON.parse(atob(token.split('.')[1]))
     return {
@@ -45,6 +48,7 @@ export const useAuthStore = defineStore('authStore', () => {
         if (userData) {
           Object.assign(user, userData)
           isAuthenticated.value = true
+          
         } else {
           clearAuthData()
         }
@@ -56,6 +60,8 @@ export const useAuthStore = defineStore('authStore', () => {
       clearAuthData()
     }
   }
+
+  
 
   async function signUp(userData) {
     try {
@@ -108,6 +114,7 @@ export const useAuthStore = defineStore('authStore', () => {
 
   return {
     user,
+    currentUserId,
     isAuthenticated,
     getUserInfo,
     isAdmin,

@@ -26,3 +26,5 @@ export const COPY_STATUS = [
 ]
 
 export const ROLES = ['Admin', 'Visitor']
+
+export const BORROW_DUE_DATE = 15;

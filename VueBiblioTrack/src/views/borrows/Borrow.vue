@@ -7,79 +7,78 @@
     </div>
 
     <div v-else>
-      <div>
+      <div class="mb-4">
+        <h2 class="h5 text-primary-subtle">Available Books</h2>
+        <p class="mb-0 text-muted small">Borrow books from BiblioTrack</p>
+      </div>
+
+      <div class="row g-3">
         <div
-          class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3"
+          class="col-12 col-sm-6 col-md-4 col-lg-3"
+          v-for="book in availableBooks"
+          :key="book.bookCopyId"
         >
-          <div>
-            <h2 class="h5 text-primary-subtle">Available Books</h2>
-            <p class="mb-0 text-muted small">Borrow books from BiblioTrack</p>
-          </div>
-        </div>
-        <div class="card-body p-3">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead>
-                <tr>
-                  <th class="ps-3 small text-muted">Title</th>
-                  <th class="small text-muted">Category</th>
-                  <th class="small text-muted">Author</th>
-                  <th class="small text-muted">Publisher</th>
-                  <th class="pe-3 text-end small text-muted"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="book in availableBooks" :key="book.bookCopyId">
-                  <td class="ps-3">
-                    <div class="d-flex align-items-center">
-                      <img
-                        :src="CONFIG_IMAGE_URL + book.imageUrl"
-                        alt="Book"
-                        class="rounded object-fit-cover me-2"
-                        style="width: 50px; height: 50px"
-                      />
-                      <div>
-                        <div class="fw-semibold small">{{ book.title }}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge bg-primary-subtle bg-opacity-10 text-primary-subtle small">
-                      {{ book.category }}
-                    </span>
-                  </td>
-                  <td class="fw-semibold small">{{ book.author }}</td>
-                  <td class="fw-semibold small">{{ book.publisher }}</td>
-                  <td class="pe-3 text-end">
-                    <div class="d-flex gap-2 justify-content-end">
-                      <button
-                        class="btn btn-sm btn-outline-primary-subtle"
-                       
-                      >
-                        <i class="bi bi-bookmark-plus" title="Borrow this book"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="card h-100 shadow-sm">
+            <div class="position-relative">
+              <img
+                :src="CONFIG_IMAGE_URL + book.imageUrl"
+                class="card-img-top object-fit-cover"
+                alt="Book"
+                style="height: 200px;"
+              />
+             
+              <div class="position-absolute top-0 end-0 m-2 dropdown">
+                <button
+                  class="btn btn-sm btn-light rounded-circle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" @click.prevent="addToFavorites(book)">Add to Favorites</a></li>
+                  <li><a class="dropdown-item" href="#" @click.prevent="borrowBook(book)">Borrow</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <h6 class="card-title">{{ book.title }}</h6>
+              <p class="card-text mb-1"><strong>Author:</strong> {{ book.author }}</p>
+              <p class="card-text mb-1"><strong>Publisher:</strong> {{ book.publisher }}</p>
+              <span class="badge bg-primary-subtle bg-opacity-10 text-primary-subtle">{{ book.category }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+
+
 <script setup>
 import bookCopyService from '@/services/bookCopyService.js'
+import borrowBookService from '@/services/borrowBookService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import { CONFIG_IMAGE_URL } from '@/constants/config'
+import { BORROW_DUE_DATE } from '@/constants/constants'
 import { useSwal } from '@/composables/swal'
+import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-const { showConfirm, showError, showSuccess } = useSwal()
+const { showConfirm, showError, showSuccess, showBorrowed } = useSwal()
+const authStore = useAuthStore();
 const availableBooks = reactive([])
 const loading = ref(false)
 const router = useRouter()
+const dueDate = new Date()
+dueDate.setDate(dueDate.getDate() + BORROW_DUE_DATE)
+const newBorrow = reactive({
+  BookId: "",
+  UserId: "",
+})
 const fetchAvailableBooks = async () => {
   availableBooks.length = 0
   loading.value = true
@@ -95,8 +94,18 @@ const fetchAvailableBooks = async () => {
 
 onMounted(fetchAvailableBooks)
 
-const borrowBook = async (bookCopyId) => {
+const borrowBook = async (book) => {
   try {
+    
+    newBorrow.BookId = Number(book.bookId);
+    newBorrow.UserId = String(authStore.currentUserId);
+    const response = await borrowBookService.borrowBook(newBorrow)
+    console.log(response)
+    if (!response) {
+        showError(response.message || 'Failed to borrow book.')
+    }
+    showBorrowed(`Enjoy reading \u{1F4D6}\u{1F60A} \nReturn by \n` + dueDate.toLocaleDateString())
+    fetchAvailableBooks()
 
   } catch (error) {
     console.log('Error borrowing book:', error)
@@ -104,4 +113,16 @@ const borrowBook = async (bookCopyId) => {
     loading.value = false
   }
 }
+
+const addToFavorites = (book) => {
+  showSuccess('Added to favorites!')
+}
+
+
 </script>
+
+<style scoped>
+.card-img-top {
+  object-fit: cover;
+}
+</style>

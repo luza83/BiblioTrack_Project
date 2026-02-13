@@ -36,6 +36,15 @@ export function useSwal() {
       confirmButtonText: 'Yes, delete it!',
     })
   }
-
-  return { showError, showSuccess, showConfirm }
+  const showBorrowed = async (message) => {
+    return await showAlert({
+      position: 'top-end',
+      width: '400px',
+      height: 'auto',
+      icon: 'success',
+      title: message,
+      showConfirmButton: true
+    })
+  }
+  return { showError, showSuccess, showConfirm, showBorrowed }
 }
