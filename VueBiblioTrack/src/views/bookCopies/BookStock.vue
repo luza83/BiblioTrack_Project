@@ -52,7 +52,7 @@
                             params: { bookId: book.bookId },
                           })
                         "
-                    style="cursor: pointer"><i class="bi bi-pencil-square"></i>
+                    style="cursor: pointer"><i class="bi bi-list-ul fs-6" title="Show Copy List"></i>
                   </td>
                 </tr>
               </tbody>

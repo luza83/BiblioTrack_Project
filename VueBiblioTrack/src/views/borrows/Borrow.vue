@@ -26,34 +26,35 @@
                 alt="Book"
                 style="height: 200px;"
               />
-             
-              <div class="position-absolute top-0 end-0 m-2 dropdown">
+              <div class="position-absolute top-0 end-0 m-2">
                 <button
                   class="btn btn-sm btn-light rounded-circle"
                   type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="bi bi-three-dots-vertical"></i>
+                  @click="borrowBook(book)"><i class="bi bi-plus fs-6" title="Borrow Book"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="#" @click.prevent="addToFavorites(book)">Add to Favorites</a></li>
-                  <li><a class="dropdown-item" href="#" @click.prevent="borrowBook(book)">Borrow</a></li>
-                </ul>
-              </div>
+              </div>          
             </div>
 
             <div class="card-body">
+              <div class="position-absolute bottom-0 end-0 m-2">
+                  <i
+                    class="bi bi-heart fs-5"
+                    id="favoritesBtn"
+                    title="Add to favorites"
+                    @click="toggleFavorites(book)"
+                    style="cursor: pointer"
+                  ></i>
+              </div>
               <h6 class="card-title">{{ book.title }}</h6>
               <p class="card-text mb-1"><strong>Author:</strong> {{ book.author }}</p>
               <p class="card-text mb-1"><strong>Publisher:</strong> {{ book.publisher }}</p>
               <span class="badge bg-primary-subtle bg-opacity-10 text-primary-subtle">{{ book.category }}</span>
-            </div>
+          </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </div> 
 </template>
 
 
@@ -71,8 +72,10 @@ import { useRouter } from 'vue-router'
 const { showConfirm, showError, showSuccess, showBorrowed } = useSwal()
 const authStore = useAuthStore();
 const availableBooks = reactive([])
+const favorites = reactive([])
 const loading = ref(false)
 const router = useRouter()
+const pickUpTime = 2 //hours
 const dueDate = new Date()
 dueDate.setDate(dueDate.getDate() + BORROW_DUE_DATE)
 const newBorrow = reactive({
@@ -104,7 +107,7 @@ const borrowBook = async (book) => {
     if (!response) {
         showError(response.message || 'Failed to borrow book.')
     }
-    showBorrowed(`Enjoy reading \u{1F4D6}\u{1F60A} \nReturn by \n` + dueDate.toLocaleDateString())
+    showBorrowed(`Book will be ready to pick up in ${pickUpTime} hours \u{1F4D6}\u{1F60A} \nReturn by \n` + dueDate.toLocaleDateString())
     fetchAvailableBooks()
 
   } catch (error) {
@@ -114,8 +117,15 @@ const borrowBook = async (book) => {
   }
 }
 
-const addToFavorites = (book) => {
-  showSuccess('Added to favorites!')
+const toggleFavorites = (book) => {
+  const favoritesBtn = document.getElementById('favoritesBtn');
+  if (favoritesBtn.classList.contains('text-danger')) {
+    favoritesBtn.classList.remove('text-danger');
+    favorites.splice(favorites.indexOf(book), 1);
+  } else {
+    favoritesBtn.classList.add('text-danger');
+    favorites.push(book);
+  }
 }
 
 
