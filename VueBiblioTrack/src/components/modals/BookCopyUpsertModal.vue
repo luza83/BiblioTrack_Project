@@ -62,7 +62,7 @@
                             <!-- Status Flow Buttons -->
                             <div class="mb-3">
                                 <label for="statusSelect" class="form-label">Status</label>
-                                <select id="statusSelect" class="form-select" v-model="copyObj.status">
+                                <select id="statusSelect" disabled class="form-select" v-model="copyObj.status">
                                     <option disabled value="">Select status</option>
                                     <option v-for="status in statuses" :key="status" :value="status">
                                         {{ status }}
@@ -151,8 +151,8 @@ watch(
   (newVal) => {
     if (!newVal) return
 
-    copyObj.status = newVal.status
-    copyObj.location = newVal.location
+    copyObj.status = newVal.status || COPY_STATUS_AVAILABLE
+    copyObj.location = newVal.location || ''
   },
   { immediate: true }
 )
