@@ -40,7 +40,7 @@
                   <td class="ps-3">
                     <div class="d-flex align-items-center">
                       <img
-                        :src="CONFIG_IMAGE_URL + book.imageUrl"
+                        :src="book.imageUrl"
                         alt="Book"
                         class="rounded object-fit-cover me-2"
                         style="width: 50px; height: 50px"
@@ -91,7 +91,6 @@
 import booksService from '@/services/booksService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
-import { CONFIG_IMAGE_URL } from '@/constants/config'
 import { useSwal } from '@/composables/swal'
 import { useRouter } from 'vue-router'
 const { showConfirm, showError, showSuccess } = useSwal()

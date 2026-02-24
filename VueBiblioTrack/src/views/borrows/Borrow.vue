@@ -21,7 +21,7 @@
           <div class="card h-100 shadow-sm">
             <div class="position-relative">
               <img
-                :src="CONFIG_IMAGE_URL + book.imageUrl"
+                :src="book.imageUrl"
                 class="card-img-top object-fit-cover"
                 alt="Book"
                 style="height: 200px;"
@@ -39,7 +39,7 @@
               <div class="position-absolute bottom-0 end-0 m-2">
                   <i
                     class="bi bi-heart fs-5"
-                    id="favoritesBtn"
+                    :id="'favoritesBtn' + book.bookId.toString()"
                     title="Add to favorites"
                     @click="toggleFavorites(book)"
                     style="cursor: pointer"
@@ -63,8 +63,6 @@
 import bookCopyService from '@/services/bookCopyService.js'
 import borrowBookService from '@/services/borrowBookService.js'
 import { ref, onMounted, reactive } from 'vue'
-import { APP_ROUTE_NAMES } from '@/constants/routeNames'
-import { CONFIG_IMAGE_URL } from '@/constants/config'
 import { BORROW_DUE_DATE } from '@/constants/constants'
 import { useSwal } from '@/composables/swal'
 import { useAuthStore } from '@/stores/authStore'
@@ -118,17 +116,23 @@ const borrowBook = async (book) => {
 }
 
 const toggleFavorites = (book) => {
-  const favoritesBtn = document.getElementById('favoritesBtn');
+
+  const favoritesBtn = document.getElementById('favoritesBtn' + book.bookId.toString());
   if (favoritesBtn.classList.contains('text-danger')) {
     favoritesBtn.classList.remove('text-danger');
-    favorites.splice(favorites.indexOf(book), 1);
+    removeFromFavorites(book);
   } else {
     favoritesBtn.classList.add('text-danger');
-    favorites.push(book);
+    addToFavorites(book);
   }
 }
 
+const addToFavorites = (book) => {
+ 
+}
+const removeFromFavorites = (book) => {
 
+}
 </script>
 
 <style scoped>

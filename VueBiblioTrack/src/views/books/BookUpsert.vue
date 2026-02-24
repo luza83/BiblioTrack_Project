@@ -93,24 +93,14 @@
           <div class="col-lg-4">
             <div>
               <img
-                v-if="bookIdForUpdate > 0 || newUploadedImage_base64 != ''"
-                :src="
-                  newUploadedImage_base64 != ''
-                    ? newUploadedImage_base64
-                    : CONFIG_IMAGE_URL + bookObj.imageUrl
-                "
+                v-if="bookIdForUpdate > 0 && bookObj.imageUrl"
+                :src="bookObj.imageUrl"
                 class="img-fluid w-100 mb-3 rounded"
                 style="aspect-ratio: 1/1; object-fit: cover"
               />
               <div class="mb-3">
                 <label for="image" class="form-label">Book Image</label>
-                <input
-                  id="image"
-                  type="file"
-                  class="form-control"
-                  accept="image/*"
-                  @change="handleFileChange"
-                />
+                <input id="image" class="form-control" v-model="bookObj.imageUrl" />
                 <div class="form-text">Leave empty to keep existing image</div>
               </div>
             </div>
@@ -125,7 +115,6 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
-import { CONFIG_IMAGE_URL } from '@/constants/config'
 import { CATEGROIES } from '@/constants/constants'
 import booksService from '@/services/booksService.js'
 import { useSwal } from '@/composables/swal'
@@ -135,8 +124,6 @@ const route = new useRoute()
 const loading = ref(false)
 const isProcessing = ref(false)
 const errorList = reactive([])
-const newUploadedImage = ref(null)
-const newUploadedImage_base64 = ref('')
 const bookIdForUpdate = route.params.bookId
 const bookObj = reactive({
   title: '',
@@ -162,19 +149,6 @@ onMounted(async () => {
   }
 })
 
-const handleFileChange = (event) => {
-  isProcessing.value = true
-  const file = event.target.files[0]
-  newUploadedImage.value = file
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      newUploadedImage_base64.value = e.target.result
-    }
-    reader.readAsDataURL(file)
-  }
-  isProcessing.value = false
-}
 
 const onFormSubmit = async (event) => {
   event.preventDefault()
@@ -197,14 +171,9 @@ const onFormSubmit = async (event) => {
   if (bookObj.category === '') {
     errorList.push('Category must be selected.')
   }
-  if (newUploadedImage.value) {
-    // add to formdata
-    formData.append('ImageFile', newUploadedImage.value)
-  } else {
-    if (bookIdForUpdate == 0) {
-      errorList.push('Image must be uploaded.')
-    }
-  }
+  if (bookObj.imageUrl === '') {
+   errorList.push('Image url must be provided.')
+  } 
   if (!errorList.length) {
     //no errors
     Object.entries(bookObj).forEach(([key, value]) => {

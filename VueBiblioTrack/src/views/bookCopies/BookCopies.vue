@@ -13,7 +13,7 @@
         ><div>
             <div>
                 <img
-                    :src="CONFIG_IMAGE_URL + book.imageUrl"
+                    :src="book.imageUrl"
                     alt="Book"
                     class="rounded object-fit-cover me-2"
                     style="width: 100px; height: 100px"
@@ -85,8 +85,7 @@
 import booksService from '@/services/booksService.js'
 import bookCopyService from '@/services/bookCopyService.js'
 import { ref, onMounted, reactive } from 'vue'
-import { APP_ROUTE_NAMES } from '@/constants/routeNames'
-import { CONFIG_IMAGE_URL } from '@/constants/config'   
+import { APP_ROUTE_NAMES } from '@/constants/routeNames'   
 import { useSwal } from '@/composables/swal'
 import { useRouter, useRoute } from 'vue-router'
 import BookCopyUpsertModal from '@/components/modals/BookCopyUpsertModal.vue'
