@@ -97,10 +97,8 @@ onMounted(fetchAvailableBooks)
 
 const borrowBook = async (book) => {
   try {
-    
-    newBorrow.BookId = Number(book.bookId);
-    newBorrow.UserId = String(authStore.currentUserId);
-    const response = await borrowBookService.borrowBook(newBorrow)
+  
+    const response = await borrowBookService.borrowBook(book.bookId)
     console.log(response)
     if (!response) {
         showError(response.message || 'Failed to borrow book.')
