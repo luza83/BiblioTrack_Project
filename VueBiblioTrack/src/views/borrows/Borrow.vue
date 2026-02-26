@@ -16,7 +16,7 @@
         <div
           class="col-12 col-sm-6 col-md-4 col-lg-3"
           v-for="book in availableBooks"
-          :key="book.bookCopyId"
+          :key="book.bookId"
         >
           <div class="card h-100 shadow-sm">
             <div class="position-relative">
@@ -38,7 +38,7 @@
             <div class="card-body">
               <div class="position-absolute bottom-0 end-0 m-2">
                   <i
-                    class="bi bi-heart fs-5"
+                    class="bi bi-heart fs-5" :class="book.isUserFavorite ? 'text-danger' : 'text-muted'"  
                     :id="'favoritesBtn' + book.bookId.toString()"
                     title="Add to favorites"
                     @click="toggleFavorites(book)"
@@ -61,6 +61,7 @@
 
 <script setup>
 import bookCopyService from '@/services/bookCopyService.js'
+import userFavoritesService from '@/services/userFavorites.js'
 import borrowBookService from '@/services/borrowBookService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { BORROW_DUE_DATE } from '@/constants/constants'
@@ -70,7 +71,6 @@ import { useRouter } from 'vue-router'
 const { showConfirm, showError, showSuccess, showBorrowed } = useSwal()
 const authStore = useAuthStore();
 const availableBooks = reactive([])
-const favorites = reactive([])
 const loading = ref(false)
 const router = useRouter()
 const pickUpTime = 2 //hours
@@ -117,22 +117,23 @@ const borrowBook = async (book) => {
 
 const toggleFavorites = (book) => {
 
-  const favoritesBtn = document.getElementById('favoritesBtn' + book.bookId.toString());
-  if (favoritesBtn.classList.contains('text-danger')) {
-    favoritesBtn.classList.remove('text-danger');
-    removeFromFavorites(book);
+  const favoritesIcon = document.getElementById('favoritesBtn' + book.bookId.toString());
+  if (favoritesIcon.classList.contains('text-danger')) {
+    removeFromFavorites(book.bookId, favoritesIcon);
   } else {
-    favoritesBtn.classList.add('text-danger');
-    addToFavorites(book);
+    addToFavorites(book.bookId, favoritesIcon);
   }
 }
 
-const addToFavorites = (book) => {
- 
+const addToFavorites = (bookId,favoritesIcon) => {
+  if( userFavoritesService.addBookToUserFavorites(bookId)) favoritesIcon.classList.add('text-danger')
+  fetchAvailableBooks();
 }
-const removeFromFavorites = (book) => {
+const removeFromFavorites = (bookId, favoritesIcon) => {
+ if(userFavoritesService.removeBookFromUserFavorites(bookId)) favoritesIcon.classList.remove('text-danger')
+ fetchAvailableBooks();
+}
 
-}
 </script>
 
 <style scoped>
