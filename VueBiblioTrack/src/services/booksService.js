@@ -1,10 +1,15 @@
 import api from '@/services/api'
 
 export default {
-  async getBooks() {
+  async getBooks(filter) {
     try {
-      const response = await api.get('/books')
-
+      const cleanFilter = {}
+      for (const key in filter) {
+        if (filter[key]) {
+          cleanFilter[key] = filter[key]
+        }}
+      const response = await api.get('/books', { params: cleanFilter })
+    
       if (response.data.isSuccess) {
         return response.data.result
       } else {
