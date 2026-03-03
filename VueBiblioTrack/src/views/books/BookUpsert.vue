@@ -101,7 +101,6 @@
               <div class="mb-3">
                 <label for="image" class="form-label">Book Image</label>
                 <input id="image" class="form-control" v-model="bookObj.imageUrl" />
-                <div class="form-text">Leave empty to keep existing image</div>
               </div>
             </div>
           </div>
