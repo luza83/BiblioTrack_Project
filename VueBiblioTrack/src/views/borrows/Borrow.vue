@@ -17,6 +17,9 @@
             <button class="btn btn-primary btn-sm me-2" @click="showFilters = !showFilters">
               🔍 Search
             </button>
+            <button class="btn btn-primary btn-sm me-2" @click="getBooksFilter.getAvailableOnly = !getBooksFilter.getAvailableOnly; onFilterChange()">
+              {{ getBooksFilter.getAvailableOnly ? 'Show All' : 'Show Available Only' }}
+            </button>
 
             <button class="btn btn-outline-secondary btn-sm" @click="resetFilters" v-if="showFilters">
               Reset
@@ -24,30 +27,34 @@
           </div>
         </div>
       </div>
-      
+
       <div v-if="showFilters" class="mb-3">
         <div class="row g-3">
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <input type="text" class="form-control form-control-sm" placeholder="Search by Title" @input="onFilterChange()" v-model="getBooksFilter.title" />
+            <input type="text" class="form-control form-control-sm" placeholder="Search by Title"
+              @input="onFilterChange()" v-model="getBooksFilter.title" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <input type="text" class="form-control form-control-sm" placeholder="Search byAuthor" @input="onFilterChange()" v-model="getBooksFilter.author" />
+            <input type="text" class="form-control form-control-sm" placeholder="Search byAuthor"
+              @input="onFilterChange()" v-model="getBooksFilter.author" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <input type="text" class="form-control form-control-sm" placeholder="Search by ISBN" @input="onFilterChange()" v-model="getBooksFilter.isbn" />
+            <input type="text" class="form-control form-control-sm" placeholder="Search by ISBN" @input="onFilterChange()"
+              v-model="getBooksFilter.isbn" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <input type="text" class="form-control form-control-sm" placeholder="Search by Publisher" @input="onFilterChange()" v-model="getBooksFilter.publisher" />
+            <input type="text" class="form-control form-control-sm" placeholder="Search by Publisher"
+              @input="onFilterChange()" v-model="getBooksFilter.publisher" />
           </div>
         </div>
       </div>
 
-      <div class="row g-3" v-if="availableBooks.length >0">
+      <div class="row g-3" v-if="availableBooks.length > 0">
         <div class="col-12 col-sm-6 col-md-4 col-lg-3" v-for="book in availableBooks" :key="book.bookId">
           <div class="card h-100 shadow-sm">
             <div class="position-relative">
               <img :src="book.imageUrl" class="card-img-top object-fit-cover" alt="Book" style="height: 200px;" />
-              <div class="position-absolute top-0 end-0 m-2">
+              <div class="position-absolute top-0 end-0 m-2" v-if="book.totalCopies > 0">
                 <button class="btn btn-sm btn-light rounded-circle" type="button" @click="borrowBook(book)"><i
                     class="bi bi-plus fs-6" title="Borrow Book"></i>
                 </button>
@@ -73,7 +80,7 @@
           <div class="card-body d-flex flex-column align-items-center justify-content-center">
             <i class="bi bi-book  fs-1 text-primary-subtle mb-3"></i>
             <h5 class="card-title text-primary-subtle">No books found</h5>
-            <p class="card-text text-muted">Try adjusting your search or filters to find what you're looking for.</p> 
+            <p class="card-text text-muted">Try adjusting your search or filters to find what you're looking for.</p>
           </div>
         </div>
       </div>
@@ -123,6 +130,8 @@ const getBooksFilter = reactive({
   isbn: '',
   publisher: '',
   category: '',
+  includeUserFavorites: true,
+  getAvailableOnly: false,
   pageNumber: 1,
   pageSize: 8,
 })
@@ -207,8 +216,6 @@ function resetFilters() {
 
 </script>
 
-<style scoped>
-.card-img-top {
+<style scoped>.card-img-top {
   object-fit: cover;
-}
-</style>
+}</style>
