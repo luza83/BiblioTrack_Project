@@ -1,9 +1,14 @@
 import api from '@/services/api'
 
 export default {
-  async getBooks(getAvailableOnly = false) {
+  async getBooks(getBooksFilter) {
+  // const cleanFilter = {}
+  //     for (const key in getBooksFilter) {
+  //       if (getBooksFilter[key]) {
+  //         cleanFilter[key] = getBooksFilter[key]
+  //       }}
     try {
-      const response = await api.get(`/bookCopies${getAvailableOnly ? '?getAvailableOnly=true' : ''}`)
+      const response = await api.get('bookCopies/', { params: getBooksFilter })
 
       if (response.data.isSuccess) {
         return response.data.result
