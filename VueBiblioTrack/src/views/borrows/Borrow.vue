@@ -149,11 +149,10 @@ const borrowBook = async (book) => {
   try {
 
     const response = await borrowBookService.borrowBook(book.bookId)
-    console.log(response)
     if (!response) {
       showError(response.message || 'Failed to borrow book.')
     }
-    showBorrowed(`Book will be ready to pick up in ${pickUpTime} hours \u{1F4D6}\u{1F60A} \nReturn by \n` + dueDate.toLocaleDateString())
+    showBorrowed(`${book.title} is now reserved and will be ready to pick up in ${pickUpTime} hours \u{1F4D6}\u{1F60A} \nReturn by \n` + dueDate.toLocaleDateString())
     fetchAvailableBooks()
 
   } catch (error) {
