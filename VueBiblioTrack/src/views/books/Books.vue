@@ -86,7 +86,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="book in books" :key="book.bookId">
+              <tr v-if="books.length > 0" v-for="book in books" :key="book.bookId">
                 <td class="ps-3">
                   <div class="d-flex align-items-center">
                     <img
@@ -126,6 +126,17 @@
                     >
                       <i class="bi bi-trash-fill"></i>
                     </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else>
+                <td colspan="5" class="text-center py-5">
+                  <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                      <i class="bi bi-book fs-1 text-primary-subtle mb-3"></i>
+                      <h5 class="card-title text-primary-subtle">No books found</h5>
+                      <p class="card-text text-muted">Try adjusting your search or filters to find what you're looking for.</p>
+                    </div>
                   </div>
                 </td>
               </tr>
