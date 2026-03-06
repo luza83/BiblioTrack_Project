@@ -53,7 +53,7 @@
         <div class="col-12 col-sm-6 col-md-4 col-lg-3" v-for="book in availableBooks" :key="book.bookId">
           <div class="card h-100 shadow-sm">
             <div class="position-relative">
-              <img :src="book.imageUrl" class="card-img-top object-fit-cover" alt="Book" style="height: 200px;" />
+              <img :src="book.imageUrl" class="card-img-top object-fit-cover"  alt="Book" style="height: 200px;" />
               <div class="position-absolute top-0 end-0 m-2" v-if="book.totalCopies > 0">
                 <button class="btn btn-sm btn-light rounded-circle" type="button" @click="borrowBook(book)"><i
                     class="bi bi-plus fs-6" title="Borrow Book"></i>
@@ -63,7 +63,7 @@
 
             <div class="card-body">
               <div class="position-absolute bottom-0 end-0 m-2">
-                <i class="bi bi-heart fs-5" :class="book.isUserFavorite ? 'text-danger' : 'text-muted'"
+                <i  :class="book.isUserFavorite ? 'bi bi-heart fs-5 text-danger' : 'bi bi-heart fs-5 text-muted'"
                   :id="'favoritesBtn' + book.bookId.toString()" title="Add to favorites" @click="toggleFavorites(book)"
                   style="cursor: pointer"></i>
               </div>
@@ -113,13 +113,9 @@ import borrowBookService from '@/services/borrowBookService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { BORROW_DUE_DATE } from '@/constants/constants'
 import { useSwal } from '@/composables/swal'
-import { useAuthStore } from '@/stores/authStore'
-import { useRouter } from 'vue-router'
-const { showConfirm, showError, showSuccess, showBorrowed } = useSwal()
-const authStore = useAuthStore();
+const { showError, showBorrowed } = useSwal()
 const availableBooks = reactive([])
 const loading = ref(false)
-const router = useRouter()
 const pickUpTime = 2 //hours
 const dueDate = new Date()
 const showFilters = ref(false);
@@ -171,23 +167,29 @@ const borrowBook = async (book) => {
   }
 }
 
-const toggleFavorites = (book) => {
 
-  const favoritesIcon = document.getElementById('favoritesBtn' + book.bookId.toString());
-  if (favoritesIcon.classList.contains('text-danger')) {
-    removeFromFavorites(book.bookId, favoritesIcon);
+const toggleFavorites = (book) => {
+  const selectedBook = document.getElementById('favoritesBtn' + book.bookId.toString());
+  console.log("icon: ", selectedBook)
+  if (book.isUserFavorite)  {
+    removeFromFavorites(book.bookId, selectedBook);
+    book.isUserFavorite = false;
   } else {
-    addToFavorites(book.bookId, favoritesIcon);
+    addToFavorites(book.bookId, selectedBook);
+    book.isUserFavorite = true;
   }
 }
 
-const addToFavorites = (bookId, favoritesIcon) => {
-  if (userFavoritesService.addBookToUserFavorites(bookId)) favoritesIcon.classList.add('text-danger')
-  fetchAvailableBooks();
+const addToFavorites = (bookId, selectedBook) => {
+  if (userFavoritesService.addBookToUserFavorites(bookId)){
+     selectedBook.classList.add('text-danger');
+  }
+  
 }
-const removeFromFavorites = (bookId, favoritesIcon) => {
-  if (userFavoritesService.removeBookFromUserFavorites(bookId)) favoritesIcon.classList.remove('text-danger')
-  fetchAvailableBooks();
+const removeFromFavorites = (bookId, selectedBook) => {
+  if (userFavoritesService.removeBookFromUserFavorites(bookId)) {
+    selectedBook.classList.remove('text-danger');
+  }
 }
 function changePage(page) {
   getBooksFilter.pageNumber = page
