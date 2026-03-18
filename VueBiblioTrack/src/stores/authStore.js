@@ -83,7 +83,7 @@ export const useAuthStore = defineStore('authStore', () => {
       Object.assign(user, userData)
       isAuthenticated.value = true
 
-      Cookies.set('token_lib', token, { expires: 7 })
+      Cookies.set('token_lib', token, { expires: 1 })
 
       router.push('/')
       return { success: true }

@@ -152,7 +152,7 @@ onMounted(fetchAvailableBooks)
 
 const borrowBook = async (book) => {
   try {
-
+    loading.value = true
     const response = await borrowBookService.borrowBook(book.bookId)
     if (!response) {
       showError(response.message || 'Failed to borrow book.')

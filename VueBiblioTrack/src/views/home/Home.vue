@@ -1,1 +1,1 @@
-<template>Home</template>
+<template>Trending, random book</template>
