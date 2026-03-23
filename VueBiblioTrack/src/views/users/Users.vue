@@ -79,9 +79,9 @@
                       {{ user.favoriteBooks.length }}
                     </td>
                   </tr>
-                  <tr v-if="expandedUserId === user.userId">
+                  <tr v-if="expandedUserId === user.userId" class="table-borderless">
                     <td colspan="4">
-                      <table class="table table-sm table-borderless mb-0">
+                      <table class="table table-striped table-sm  mb-0">
                         <thead>
                           <tr>
                             <th class="small text-muted">Title</th>
@@ -94,23 +94,29 @@
                             <td v-else>{{ item.title }}</td>
                             <td>
                               <div v-if="selectedBookList == 'reserved'" class="text-start">
-                                <button class="btn btn-sm btn-danger me-2" @click.stop="updateUserBook(BORROW_STATUS_RESERVED, BORROW_STATUS_AVAILABLE, item)">
+                                <button class="btn btn-sm btn-danger me-2"
+                                  @click.stop="updateUserBook(BORROW_STATUS_AVAILABLE, item)">
                                   Remove from reserved
                                 </button>
-                                <button class="btn btn-sm btn-success" @click.stop="updateUserBook(BORROW_STATUS_RESERVED, BORROW_STATUS_BORROWED, item)">
+                                <button class="btn btn-sm btn-danger me-2" @click.stop="addToFavorites(item.book.bookId)">
+                                  Add to favorites
+                                </button>
+                                <button class="btn btn-sm btn-success"
+                                  @click.stop="updateUserBook(BORROW_STATUS_BORROWED, item)">
                                   Pick Up
                                 </button>
                               </div>
                               <div v-else-if="selectedBookList == 'borrowed'" class="text-start">
-                                <button class="btn btn-sm btn-warning" @click.stop="updateUserBook( BORROW_STATUS_BORROWED, BORROW_STATUS_AVAILABLE, item)">
+                                <button class="btn btn-sm btn-warning"
+                                  @click.stop="updateUserBook(BORROW_STATUS_AVAILABLE, item)">
                                   Return
                                 </button>
                               </div>
                               <div v-else class="text-start">
-                                <button class="btn btn-sm btn-danger me-2" @click.stop="updateUserFavorite(item)">
+                                <button class="btn btn-sm btn-danger me-2" @click.stop="removeFromFavorites(item.bookId)">
                                   Remove from favorites
                                 </button>
-                                <button class="btn btn-sm btn-success"  @click.stop="borrowBook(item.bookId)">
+                                <button class="btn btn-sm btn-success" @click.stop="borrowFavoriteBook(BORROW_STATUS_BORROWED, item.bookId)">
                                   Borrow
                                 </button>
                               </div>
@@ -131,14 +137,16 @@
   </div>
 </template>
 <script setup>
-import usersActivityService from '@/services/usersActivity.js'
+import usersActivityService from '@/services/usersActivityService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { BORROW_STATUS, BORROW_STATUS_AVAILABLE, BORROW_STATUS_BORROWED, BORROW_STATUS_RESERVED, BORROW_STATUS_OVERDUE } from '@/constants/constants'
 import borrowBookService from '@/services/borrowBookService.js'
+import userFavoritesService from '@/services/userFavoritesService.js'
 import { useSwal } from '@/composables/swal'
 import { useRouter } from 'vue-router'
+import moment from 'moment'
 
-const { showConfirm, showError, showSuccess } = useSwal();
+const { showConfirm, showError, showSuccess, showConfirmBorrowStatus } = useSwal();
 const books = reactive([]);
 const loading = ref(false);
 const router = useRouter();
@@ -193,53 +201,97 @@ function displayDetails(userId, listType, objList) {
   selectedBookList.value = listType
   currentDetails.value = objList
 }
-const  updateUserBook = async (oldStatus, newStatus, borrow)  => {
-  try{
-    if(oldStatus != newStatus) 
-    {
+const updateUserBook = async (newStatus, borrow) => {
+  try {
+    if (borrow.status != newStatus) {
       updateUserBookRequest.borrowId = borrow.borrowId
       updateUserBookRequest.dueDate = borrow.dueDate != updateUserBookRequest.dueDate ? new Date(new Date().setDate(new Date().getDate() + 14)) : null
-      updateUserBookRequest.oldBorrowStatus = oldStatus
       updateUserBookRequest.newBorrowStatus = newStatus
-     
-      
+
+
       const response = await borrowBookService.updateBorrowingStatus(updateUserBookRequest);
-      if(!response) {
+      if (!response) {
         showError(response.message || 'Failed to update user book.')
       } else {
         showSuccess('User book updated successfully!')
         fetchUsers();
         expandedUserId.value = null
+        updateUserBookRequest.borrowId = null
+        updateUserBookRequest.dueDate = null
+        updateUserBookRequest.newBorrowStatus = null
       }
-    
+
+    }
   }
-  }
-  catch(error) {
-      console.error('Error updating book:', error)
-      throw error
+  catch (error) {
+    console.error('Error updating book:', error)
+    throw error
   }
 
 }
 
-const borrowBook = async (bookId) => {
+// const borrowBook = async (bookId) => {
+//   try {
+//     loading.value = true
+//     const response = await borrowBookService.borrowBook(bookId)
+//     if (!response) {
+//       showError(response.message || 'Failed to borrow book.')
+//     }
+//     showSuccess('Book borrowed successfully!')
+//     fetchUsers()
+//     expandedUserId.value = null
+//   } catch (error) {
+//     console.log('Error borrowing book:', error)
+//   } finally {
+//     loading.value = false
+//   }
+// }
+
+const borrowFavoriteBook = async (borrowStatus, bookId) => {
   try {
     loading.value = true
-    const response = await borrowBookService.borrowBook(bookId)
+    let request = {
+      bookId: bookId,
+      userId: expandedUserId.value
+    }
+    const response = await borrowBookService.borrowBook(request,true)
     if (!response) {
       showError(response.message || 'Failed to borrow book.')
     }
-    showSuccess('Book borrowed successfully!')
+    let dueDate = moment(response.dueDate).format('MMMM Do YYYY')
+    await showConfirmBorrowStatus(dueDate, async () => {
+      updateUserBookRequest.borrowId = response.borrowId
+      updateUserBookRequest.dueDate = response.dueDate
+      updateUserBookRequest.newBorrowStatus = borrowStatus
+
+      await borrowBookService.updateBorrowingStatus(updateUserBookRequest)
+    })
     fetchUsers()
     expandedUserId.value = null
+    updateUserBookRequest.borrowId = null
+    updateUserBookRequest.dueDate = null
+    updateUserBookRequest.newBorrowStatus = null
   } catch (error) {
     console.log('Error borrowing book:', error)
   } finally {
     loading.value = false
   }
 }
-function updateUserFavorite() {
-  // Implement logic to update user's favorite books
-  console.log('Update favorite for user:')
+
+const addToFavorites = (bookId) => {
+  if (userFavoritesService.addBookToUserFavorites(bookId)) {
+    fetchUsers()
+    expandedUserId.value = null
+    //selectedBook.classList.add('text-danger');
+  }
+
+}
+const removeFromFavorites = (bookId) => {
+  if (userFavoritesService.removeBookFromUserFavorites(bookId)) {
+    fetchUsers()
+    expandedUserId.value = null
+    //selectedBook.classList.remove('text-danger');
+  }
 }
 
-</script>
+</script>@/services/usersActivityService.js

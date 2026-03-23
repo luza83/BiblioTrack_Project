@@ -46,5 +46,26 @@ export function useSwal() {
       showConfirmButton: true
     })
   }
-  return { showError, showSuccess, showConfirm, showBorrowed }
+
+const showConfirmBorrowStatus = async (dueDate, onConfirm) => {
+  return await showAlert({
+    title: `This book has been reserved. Due date: ${dueDate}`,
+    text: "Do you want to pick up this book now?",
+    showDenyButton: true,
+    confirmButtonText: "Yes",
+    denyButtonText: "No",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      if (onConfirm) {
+        await onConfirm()
+      }
+      Swal.fire("Success!", 'Book picked up.', "success")
+    } else if (result.isDenied) {
+      Swal.fire("Reserved!", 'Book is reserved.', "info")
+    }
+  })
 }
+
+  return { showError, showSuccess, showConfirm, showBorrowed, showConfirmBorrowStatus }
+}
+

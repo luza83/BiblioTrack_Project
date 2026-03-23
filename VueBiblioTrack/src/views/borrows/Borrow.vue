@@ -108,8 +108,9 @@
 
 <script setup>
 import bookCopyService from '@/services/bookCopyService.js'
-import userFavoritesService from '@/services/userFavorites.js'
+import userFavoritesService from '@/services/userFavoritesService.js'
 import borrowBookService from '@/services/borrowBookService.js'
+import { useAuthStore } from "@/stores/authStore";
 import { ref, onMounted, reactive } from 'vue'
 import { BORROW_DUE_DATE } from '@/constants/constants'
 import { useSwal } from '@/composables/swal'
@@ -119,6 +120,7 @@ const loading = ref(false)
 const pickUpTime = 2 //hours
 const dueDate = new Date()
 const showFilters = ref(false);
+const authStore = useAuthStore()
 dueDate.setDate(dueDate.getDate() + BORROW_DUE_DATE)
 const getBooksFilter = reactive({
   title: '',
@@ -153,7 +155,11 @@ onMounted(fetchAvailableBooks)
 const borrowBook = async (book) => {
   try {
     loading.value = true
-    const response = await borrowBookService.borrowBook(book.bookId)
+    let request = {
+      bookId: book.bookId,
+      userId: authStore.currentUserId
+    }
+    const response = await borrowBookService.borrowBook(request)
     if (!response) {
       showError(response.message || 'Failed to borrow book.')
     }
@@ -220,4 +226,4 @@ function resetFilters() {
 
 <style scoped>.card-img-top {
   object-fit: cover;
-}</style>
+}</style>@/services/userFavoritesService.js
