@@ -23,7 +23,7 @@
                             :to="{name: APP_ROUTE_NAMES.BORROW_BOOK}">Borrow
                         </router-link>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown" v-if="authStore.isAdmin">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Admin
                     </a>
