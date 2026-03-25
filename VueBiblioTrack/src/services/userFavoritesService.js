@@ -1,9 +1,9 @@
 import api from '@/services/api'
 
 export default {
-    async getUserFavorites(userId) {
+    async getUserFavorites(request) {
         try {
-            const response =  await api.get( `/userFavoriteBook/allFavoriteBooks?userId=${encodeURIComponent(userId)}`);
+            const response =  await api.get('/userFavoriteBooks', { params: request })
             if (!response.data.isSuccess) throw new Error('Failed to get users favorites') 
             return response.data.result; 
 
@@ -13,9 +13,9 @@ export default {
                 throw error
             }
         },
-    async addBookToUserFavorites(bookId) {
+    async addBookToUserFavorites(request) {
         try {
-            const response = await api.post(`/userFavoriteBook/${bookId}`)
+            const response = await api.post('/userFavoriteBook', request)
 
             if (!response.data.isSuccess) throw new Error('Failed to set book as favorite') 
             return true;
@@ -26,9 +26,9 @@ export default {
                 throw error
             }
         },
-    async removeBookFromUserFavorites(bookId) {
+    async removeBookFromUserFavorites(request) {
         try {
-            const response = await api.delete(`/userFavoriteBook/${bookId}`)
+            const response = await api.delete('/userFavoriteBook', { data: request })
             if (!response.data.isSuccess) throw new Error('Failed to remove book from favorites') 
             return true;
 

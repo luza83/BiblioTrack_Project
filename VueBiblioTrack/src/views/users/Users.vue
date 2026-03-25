@@ -41,21 +41,20 @@
               <thead>
                 <tr>
                   <th class="ps-3 small text-muted">Name</th>
-                  <th class="small text-muted"
+                  <th class="small text-muted no-cursor"
                     :class="selectedBookList == 'reserved' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''">
                     Reserved Books</th>
-                  <th class="small text-muted"
+                  <th class="small text-muted no-cursor"
                     :class="selectedBookList == 'borrowed' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''">
                     Borrowed Books</th>
-                  <th class="small text-muted"
+                  <th class="small text-muted no-cursor"
                     :class="selectedBookList == 'favorite' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''">
                     Favorites</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-for="user in users" :key="user.userId">
-                  <tr @click="toggleUser(user.userId)" :class="{ 'table-active': selectedUserId === user.userId }"
-                    style="cursor:pointer">
+                  <tr @click="toggleUser(user.userId)" :class="{ 'table-active': selectedUserId === user.userId }">
                     <td>
                       <span class="badge bg-primary-subtle bg-opacity-10 text-primary-subtle small">
                         {{ user.userName }}
@@ -63,25 +62,25 @@
                     </td>
                     <td class="fw-semibold small"
                       :class="selectedBookList == 'reserved' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
-                      @click.stop="displayDetails(user.userId, 'reserved', user.reservedBooks)">
+                      @click.stop="displayDetails(user.userId, 'reserved', user.reservedBooks)" style="cursor: pointer;">
                       {{ user.reservedBooks.length }}
                     </td>
 
                     <td class="fw-semibold small"
                       :class="selectedBookList == 'borrowed' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
-                      @click.stop="displayDetails(user.userId, 'borrowed', user.borrowedBooks)">
+                      @click.stop="displayDetails(user.userId, 'borrowed', user.borrowedBooks)" style="cursor: pointer;">
                       {{ user.borrowedBooks.length }}
                     </td>
 
                     <td class="fw-semibold small"
                       :class="selectedBookList == 'favorite' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
-                      @click.stop="displayDetails(user.userId, 'favorite', user.favoriteBooks)">
+                      @click.stop="displayDetails(user.userId, 'favorite', user.favoriteBooks)" style="cursor: pointer;">
                       {{ user.favoriteBooks.length }}
                     </td>
                   </tr>
-                  <tr v-if="expandedUserId === user.userId" class="table-borderless">
+                  <tr v-if="expandedUserId === user.userId" class="table-borderless table-active">
                     <td colspan="4">
-                      <table class="table table-striped table-sm  mb-0">
+                      <table class="table table-sm  mb-0">
                         <thead>
                           <tr>
                             <th class="small text-muted">Title</th>
@@ -90,8 +89,7 @@
                         </thead>
                         <tbody>
                           <tr v-for="item in currentDetails" :key="item.id">
-                            <td v-if="selectedBookList != 'favorite'">{{ item.book.title }}</td>
-                            <td v-else>{{ item.title }}</td>
+                            <td>{{ item.book.title }}</td>
                             <td>
                               <div v-if="selectedBookList == 'reserved'" class="text-start">
                                 <button class="btn btn-sm btn-danger me-2"
@@ -116,7 +114,7 @@
                                 <button class="btn btn-sm btn-danger me-2" @click.stop="removeFromFavorites(item.bookId)">
                                   Remove from favorites
                                 </button>
-                                <button class="btn btn-sm btn-success" @click.stop="borrowFavoriteBook(BORROW_STATUS_BORROWED, item.bookId)">
+                                <button v-if="item.isBorrowable" class="btn btn-sm btn-success" @click.stop="borrowFavoriteBook(BORROW_STATUS_BORROWED, item.bookId)">
                                   Borrow
                                 </button>
                               </div>
@@ -279,7 +277,11 @@ const borrowFavoriteBook = async (borrowStatus, bookId) => {
 }
 
 const addToFavorites = (bookId) => {
-  if (userFavoritesService.addBookToUserFavorites(bookId)) {
+  let request = {
+    userId: expandedUserId.value,
+    bookId: bookId
+  }
+  if (userFavoritesService.addBookToUserFavorites(request)) {
     fetchUsers()
     expandedUserId.value = null
     //selectedBook.classList.add('text-danger');
@@ -287,7 +289,11 @@ const addToFavorites = (bookId) => {
 
 }
 const removeFromFavorites = (bookId) => {
-  if (userFavoritesService.removeBookFromUserFavorites(bookId)) {
+  let request = {
+    userId: expandedUserId.value,
+    bookId: bookId
+  }
+  if (userFavoritesService.removeBookFromUserFavorites(request)) {
     fetchUsers()
     expandedUserId.value = null
     //selectedBook.classList.remove('text-danger');

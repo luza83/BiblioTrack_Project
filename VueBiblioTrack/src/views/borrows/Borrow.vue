@@ -136,6 +136,10 @@ const getBooksFilter = reactive({
 
 const totalPages = ref(1)
 let debounceTimer = ref(null)
+let userFavoriteBookRequest = {
+  userId: authStore.currentUserId,
+  bookId: null
+}
 const fetchAvailableBooks = async () => {
   availableBooks.length = 0
   loading.value = true
@@ -187,13 +191,15 @@ const toggleFavorites = (book) => {
 }
 
 const addToFavorites = (bookId, selectedBook) => {
-  if (userFavoritesService.addBookToUserFavorites(bookId)){
+  userFavoriteBookRequest.bookId = bookId
+  if (userFavoritesService.addBookToUserFavorites(userFavoriteBookRequest)){
      selectedBook.classList.add('text-danger');
   }
   
 }
 const removeFromFavorites = (bookId, selectedBook) => {
-  if (userFavoritesService.removeBookFromUserFavorites(bookId)) {
+  userFavoriteBookRequest.bookId = bookId
+  if (userFavoritesService.removeBookFromUserFavorites(userFavoriteBookRequest)) {
     selectedBook.classList.remove('text-danger');
   }
 }
