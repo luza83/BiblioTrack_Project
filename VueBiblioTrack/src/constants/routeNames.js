@@ -8,6 +8,7 @@ export const APP_ROUTE_NAMES = Object.freeze({
     CREATE_BOOK_COPY: 'create-book-copy',
     EDIT_BOOK_COPY: 'edit-book-copy',
     BORROW_BOOK: 'borrow-book',
+    MY_BOOKS: 'my-books',
     USERS: 'users',
     SIGN_IN: 'sign-in',   
     SIGN_UP: 'sign-up',

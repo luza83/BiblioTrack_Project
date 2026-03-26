@@ -20,7 +20,14 @@
                        <router-link 
                             class="nav-link" 
                             aria-current="page" 
-                            :to="{name: APP_ROUTE_NAMES.BORROW_BOOK}">Borrow
+                            :to="{name: APP_ROUTE_NAMES.BORROW_BOOK}">Library
+                        </router-link>
+                    </li>
+                    <li class="nav-item" v-if="authStore.isAuthenticated && !authStore.isAdmin">
+                        <router-link 
+                            class="nav-link" 
+                            aria-current="page" 
+                            :to="{name: APP_ROUTE_NAMES.MY_BOOKS}">My Books
                         </router-link>
                     </li>
                     <li class="nav-item dropdown" v-if="authStore.isAdmin">

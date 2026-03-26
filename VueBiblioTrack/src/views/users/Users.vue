@@ -141,13 +141,12 @@ import { BORROW_STATUS, BORROW_STATUS_AVAILABLE, BORROW_STATUS_BORROWED, BORROW_
 import borrowBookService from '@/services/borrowBookService.js'
 import userFavoritesService from '@/services/userFavoritesService.js'
 import { useSwal } from '@/composables/swal'
-import { useRouter } from 'vue-router'
+
 import moment from 'moment'
 
 const { showConfirm, showError, showSuccess, showConfirmBorrowStatus } = useSwal();
 const books = reactive([]);
 const loading = ref(false);
-const router = useRouter();
 const users = reactive([]);
 const selectedUserId = ref(null);
 const expandedUserId = ref(null)
