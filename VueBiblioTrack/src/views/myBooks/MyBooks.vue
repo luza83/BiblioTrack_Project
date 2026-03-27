@@ -18,8 +18,9 @@
                     <thead>
                         <tr>
                             <th>Title</th>
+                            <th>Borrow Date</th>
                             <th>Due Date</th>
-                            <th>Actions</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,10 +34,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ formatDate(item.book.dueDate) }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary me-2">Renew</button>
-                                <button class="btn btn-sm btn-outline-danger">Return</button>
+                            <td>{{ formatDate(item.borrowDate) }}</td>
+                            <td :class="item.isOverdue ? 'text-danger' : ''">{{ item.isOverdue ? formatDate(item.dueDate) + ' ⚠' : formatDate(item.dueDate) }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-primary me-2" v-if="!item.isOverdue && renewable(item)"
+                                    @click="updateUserBook(BORROW_STATUS_BORROWED, item, true)">Renew</button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                    @click="updateUserBook(BORROW_STATUS_RETURNED, item, false)">Return</button>
                             </td>
                         </tr>
                     </tbody>
@@ -52,7 +56,7 @@
                         <tr>
                             <th>Title</th>
                             <th>Reserved Date</th>
-                            <th>Actions</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,48 +70,18 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ formatDate(item.book.borrowDate) }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-danger me-2">Remove</button>
-                                <button class="btn btn-sm btn-outline-primary">Pick Up</button>
+                            <td>{{ formatDate(item.borrowDate) }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger me-2"
+                                    @click="updateUserBook(BORROW_STATUS_AVAILABLE, item, false)">Remove</button>
+                                <button class="btn btn-sm btn-outline-primary"
+                                    @click="updateUserBook(BORROW_STATUS_BORROWED, item, false)">Pick Up</button>
                             </td>
                         </tr>
                     </tbody>
 
                 </table>
                 <p v-else class="text-muted justify-content-center align-items-center text-center">No reserved books</p>
-            </section>
-
-            <!-- Overdue Books -->
-            <section class="card overdue mb-3 p-3 border-3">
-                <h4>Overdue Books</h4>
-                <table v-if="userOverview.overdueBooks.length" class="table-responsive table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Due Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in userOverview.overdueBooks" :key="item.book.id">
-                            <td class="ps-3 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2 p-2"
-                                        style="width: 50px; height: 50px" />
-                                    <div>
-                                        <div class="fw-semibold small">{{ item.book.title }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{{ formatDate(item.book.dueDate) }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary">Return</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p v-else class="text-muted justify-content-center align-items-center text-center">No overdue books 🎉</p>
             </section>
 
             <!-- Favorite Books -->
@@ -117,7 +91,7 @@
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th>Actions</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,9 +105,12 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-danger me-2">Remove</button>
-                                <button class="btn btn-sm btn-outline-primary" v-if="item.isBorrowable">Borrow</button>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger me-2"
+                                    @click="removeFromFavorites(item.book.bookId)">Remove</button>
+                                <button class="btn btn-sm btn-outline-primary"
+                                    @click="borrowFavoriteBook(BORROW_STATUS_RESERVED, item.bookId)"
+                                    v-if="item.isBorrowable">Borrow</button>
                             </td>
                         </tr>
                     </tbody>
@@ -146,10 +123,26 @@
 <script setup>
 import usersActivityService from '@/services/usersActivityService.js'
 import { onMounted, reactive, ref } from 'vue'
+import {
+    BORROW_STATUS,
+    BORROW_STATUS_AVAILABLE,
+    BORROW_STATUS_BORROWED,
+    BORROW_STATUS_RESERVED,
+    BORROW_STATUS_OVERDUE,
+    BORROW_STATUS_RETURNED
+} from '@/constants/constants'
+import borrowBookService from '@/services/borrowBookService.js'
+import userFavoritesService from '@/services/userFavoritesService.js'
+import { useSwal } from '@/composables/swal'
 import moment from 'moment';
 
+const { showConfirm, showError, showSuccess, showConfirmBorrowStatus,showBorrowed } = useSwal();
 const loading = ref(true);
-
+const updateUserBookRequest = reactive({
+    borrowId: null,
+    dueDate: null,
+    newBorrowStatus: null
+})
 const userOverview = reactive({
     userId: '',
     userName: '',
@@ -179,4 +172,91 @@ const fetchMyBooks = async () => {
         loading.value = false;
     }
 };
+const renewable = (borrow) =>{
+      if (!borrow?.dueDate) return false;
+
+    const diffDays = moment(borrow.dueDate).diff(moment(), 'days');
+
+    return diffDays <= 3 && diffDays >= 0;
+}
+const updateUserBook = async (newStatus, borrow, renew = false) => {
+    try {
+        if (borrow.status != newStatus || renew) {
+            updateUserBookRequest.borrowId = borrow.borrowId
+            let successTxt = 'Book updated successfully!'
+            if (borrow.isOverdue) {
+                successTxt = 'Returned overdue book successfully! You will receive a notification if there are any fines to be paid.'
+            }
+            if (renew && !borrow.isOverdue) {
+                successTxt = 'Book renewed successfully! New due date is in 7 days.'
+                updateUserBookRequest.dueDate = new Date(new Date().setDate(new Date().getDate() + 7));
+            }else{
+                updateUserBookRequest.dueDate = borrow.dueDate
+            }
+            
+            updateUserBookRequest.newBorrowStatus = newStatus
+
+
+            const response = await borrowBookService.updateBorrowingStatus(updateUserBookRequest);
+            if (!response) {
+                showError(response.message || 'Failed to update user book.')
+            } else {
+
+                showBorrowed(successTxt)
+                fetchMyBooks();
+                updateUserBookRequest.borrowId = null
+                updateUserBookRequest.dueDate = null
+                updateUserBookRequest.newBorrowStatus = null
+            }
+
+        }
+    }
+    catch (error) {
+        console.error('Error updating book:', error)
+        throw error
+    }
+
+}
+
+const borrowFavoriteBook = async (borrowStatus, bookId) => {
+    try {
+        loading.value = true
+        let request = {
+            bookId: bookId,
+            userId: userOverview.userId
+        }
+        const response = await borrowBookService.borrowBook(request, true)
+        if (!response) {
+            showError(response.message || 'Failed to borrow book.')
+        }
+        let dueDate = moment(response.dueDate).format('MMMM Do YYYY')
+        await showConfirmBorrowStatus(dueDate, async () => {
+            updateUserBookRequest.borrowId = response.borrowId
+            updateUserBookRequest.dueDate = response.dueDate
+            updateUserBookRequest.newBorrowStatus = BORROW_STATUS_BORROWED
+        
+            await borrowBookService.updateBorrowingStatus( updateUserBookRequest)
+        })
+        fetchMyBooks()
+        updateUserBookRequest.borrowId = null
+        updateUserBookRequest.dueDate = null
+        updateUserBookRequest.newBorrowStatus = null
+    } catch (error) {
+        console.log('Error borrowing book:', error)
+    } finally {
+        loading.value = false
+    }
+}
+
+const removeFromFavorites = (bookId) => {
+    let request = {
+        userId: userOverview.userId,
+        bookId: bookId
+    }
+    if (userFavoritesService.removeBookFromUserFavorites(request)) {
+        fetchMyBooks()
+    }
+}
+
+
 </script>

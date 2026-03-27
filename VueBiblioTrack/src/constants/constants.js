@@ -29,6 +29,7 @@ export const BORROW_STATUS_AVAILABLE = 'Available'
 export const BORROW_STATUS_BORROWED = 'Borrowed'
 export const BORROW_STATUS_RESERVED = 'Reserved'
 export const BORROW_STATUS_OVERDUE = 'Overdue'
+export const BORROW_STATUS_RETURNED = 'Returned'
 
 export const BORROW_STATUS = [
     BORROW_STATUS_AVAILABLE,

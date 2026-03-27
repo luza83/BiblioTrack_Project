@@ -106,7 +106,7 @@
                               </div>
                               <div v-else-if="selectedBookList == 'borrowed'" class="text-start">
                                 <button class="btn btn-sm btn-warning"
-                                  @click.stop="updateUserBook(BORROW_STATUS_AVAILABLE, item)">
+                                  @click.stop="updateUserBook(BORROW_STATUS_RETURNED, item)">
                                   Return
                                 </button>
                               </div>
@@ -137,7 +137,12 @@
 <script setup>
 import usersActivityService from '@/services/usersActivityService.js'
 import { ref, onMounted, reactive } from 'vue'
-import { BORROW_STATUS, BORROW_STATUS_AVAILABLE, BORROW_STATUS_BORROWED, BORROW_STATUS_RESERVED, BORROW_STATUS_OVERDUE } from '@/constants/constants'
+import {  BORROW_STATUS,
+          BORROW_STATUS_AVAILABLE, 
+          BORROW_STATUS_BORROWED, 
+          BORROW_STATUS_RESERVED, 
+          BORROW_STATUS_OVERDUE, 
+          BORROW_STATUS_RETURNED } from '@/constants/constants'
 import borrowBookService from '@/services/borrowBookService.js'
 import userFavoritesService from '@/services/userFavoritesService.js'
 import { useSwal } from '@/composables/swal'
@@ -226,23 +231,6 @@ const updateUserBook = async (newStatus, borrow) => {
   }
 
 }
-
-// const borrowBook = async (bookId) => {
-//   try {
-//     loading.value = true
-//     const response = await borrowBookService.borrowBook(bookId)
-//     if (!response) {
-//       showError(response.message || 'Failed to borrow book.')
-//     }
-//     showSuccess('Book borrowed successfully!')
-//     fetchUsers()
-//     expandedUserId.value = null
-//   } catch (error) {
-//     console.log('Error borrowing book:', error)
-//   } finally {
-//     loading.value = false
-//   }
-// }
 
 const borrowFavoriteBook = async (borrowStatus, bookId) => {
   try {
