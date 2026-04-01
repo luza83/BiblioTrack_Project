@@ -1,21 +1,6 @@
 import api from '@/services/api'
 
 export default {
-  async getBooks(getBooksFilter) {
-
-    try {
-      const response = await api.get('bookCopies/', { params: getBooksFilter })
-
-      if (response.data.isSuccess) {
-        return response.data.result
-      } else {
-        throw new Error('Failed to fetch books')
-      }
-    } catch (error) {
-      console.error('Error fetching books:', error)
-      throw error
-    }
-  },
 
   async getBookCopies(bookId) {
     try {

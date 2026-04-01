@@ -7,9 +7,10 @@ export default {
       for (const key in filter) {
         if (filter[key]) {
           cleanFilter[key] = filter[key]
-        }}
+        }
+      }
       const response = await api.get('/books', { params: cleanFilter })
-    
+
       if (response.data.isSuccess) {
         return response.data.result
       } else {
@@ -76,4 +77,33 @@ export default {
       throw error
     }
   },
+  async getBorrowableBooks(getBooksFilter) {
+
+    try {
+      const response = await api.get('books/borrowable', { params: getBooksFilter })
+
+      if (response.data.isSuccess) {
+        return response.data.result
+      } else {
+        throw new Error('Failed to fetch books')
+      }
+    } catch (error) {
+      console.error('Error fetching books:', error)
+      throw error
+    }
+  },
+  async getBorrowableBookById(bookId) {
+    try {
+      const response = await api.get(`/books/borrowable/${bookId}`)
+      if (response.data.isSuccess) {
+        return response.data.result
+      } else {
+        throw new Error('Failed to fetch book')
+      }
+    } catch (error) {
+      console.error('Error fetching book:', error)
+      throw error
+    }
+  }
+
 }

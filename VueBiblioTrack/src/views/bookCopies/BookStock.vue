@@ -105,7 +105,7 @@
   </div>
 </template>
 <script setup>
-import bookCopyService from '@/services/bookCopyService.js'
+import booksService from '@/services/booksService.js'
 import { ref, onMounted, reactive } from 'vue'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import { useSwal } from '@/composables/swal'
@@ -130,7 +130,7 @@ const fetchBooks = async () => {
   books.length = 0
   loading.value = true
   try {
-    var result = await bookCopyService.getBooks(getBooksFilter)
+    var result = await booksService.getBorrowableBooks(getBooksFilter)
     books.push(...result.data)
     totalPages.value = result.totalPages
   } catch (error) {
