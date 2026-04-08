@@ -163,8 +163,7 @@ const fetchMyBooks = async () => {
         loading.value = true;
         const response = await usersActivityService.getCurrentUserActivity();
         Object.assign(userOverview, response);
-        console.log('Fetched user activity:', response);
-        console.log('Fetched user overview:', userOverview);
+
     } catch (error) {
         console.error('Error fetching my books:', error);
         loading.value = false;
@@ -189,7 +188,7 @@ const updateUserBook = async (newStatus, borrow, renew = false) => {
             }
             if (renew && !borrow.isOverdue) {
                 successTxt = 'Book renewed successfully! New due date is in 7 days.'
-                updateUserBookRequest.dueDate = new Date(new Date().setDate(new Date().getDate() + 7));
+                updateUserBookRequest.dueDate = new Date(new Date().setDate(new Date().getDate() + BORROW_RENEWAL_DAYS));
             }else{
                 updateUserBookRequest.dueDate = borrow.dueDate
             }
