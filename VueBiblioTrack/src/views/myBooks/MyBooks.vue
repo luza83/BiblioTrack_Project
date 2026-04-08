@@ -130,6 +130,7 @@ import {
     BORROW_STATUS_RESERVED,
     BORROW_STATUS_OVERDUE,
     BORROW_STATUS_RETURNED
+    MINIMUM_DAYS_FOR_RENEW
 } from '@/constants/constants'
 import borrowBookService from '@/services/borrowBookService.js'
 import userFavoritesService from '@/services/userFavoritesService.js'
@@ -176,7 +177,7 @@ const renewable = (borrow) =>{
 
     const diffDays = moment(borrow.dueDate).diff(moment(), 'days');
 
-    return diffDays <= 3 && diffDays >= 0;
+    return diffDays <= MINIMUM_DAYS_FOR_RENEW && diffDays >= 0;
 }
 const updateUserBook = async (newStatus, borrow, renew = false) => {
     try {
