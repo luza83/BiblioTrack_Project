@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-md rounded-3 mx-auto my-2 w-100 bg-primary-subtle bg-opacity-10 text-primary-subtle">
         <div class="container-fluid">
-            <router-link class="navbar-brand" :to="APP_ROUTE_NAMES.HOME">
+            <router-link class="navbar-brand" :to="APP_ROUTE_NAMES.DASHBOARD">
                 <img src="@/assets/logo.png" alt="Logo" height="64px" class="d-inline-block align-text-top me-2">
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -11,7 +11,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <router-link class="nav-link active" aria-current="page" :to="APP_ROUTE_NAMES.HOME">Home
+                        <router-link class="nav-link" aria-current="page" :to="APP_ROUTE_NAMES.DASHBOARD">Dashboard
                         </router-link>
                     </li>
                     <li class="nav-item" v-if="!authStore.isAdmin">

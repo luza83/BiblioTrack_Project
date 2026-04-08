@@ -1,5 +1,5 @@
 export const APP_ROUTE_NAMES = Object.freeze({
-    HOME: '/',
+    DASHBOARD: '/',
     BOOKS: 'books',
     CREATE_BOOK: 'create-book',
     EDIT_BOOK: 'edit-book',

@@ -3,7 +3,7 @@ import NoAccess from '@/views/auth/NoAccess.vue'
 import NotFound from '@/views/auth/NotFound.vue'
 import SignIn from '@/views/auth/SignIn.vue'
 import SignUp from '@/views/auth/SignUp.vue'
-import Home from '@/views/home/Home.vue'
+import Dashboard from '@/views/dashboard/Dashboard.vue'
 import Books from '@/views/books/Books.vue'
 import BookUpsert from '@/views/books/BookUpsert.vue'
 import BookStock from '@/views/bookCopies/BookStock.vue'
@@ -21,8 +21,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: APP_ROUTE_NAMES.HOME,
-      component: Home,
+      name: APP_ROUTE_NAMES.DASHBOARD,
+      component: Dashboard,
     },
     {
       path: '/no-access',

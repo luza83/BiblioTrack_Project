@@ -109,7 +109,7 @@ export const useAuthStore = defineStore('authStore', () => {
 
   function signOut() {
     clearAuthData()
-    router.push({ name: APP_ROUTE_NAMES.HOME })
+    router.push({ name: APP_ROUTE_NAMES.DASHBOARD })
   }
 
   return {
