@@ -129,7 +129,7 @@ import {
     BORROW_STATUS_BORROWED,
     BORROW_STATUS_RESERVED,
     BORROW_STATUS_OVERDUE,
-    BORROW_STATUS_RETURNED
+    BORROW_STATUS_RETURNED,
     MINIMUM_DAYS_FOR_RENEW
 } from '@/constants/constants'
 import borrowBookService from '@/services/borrowBookService.js'
