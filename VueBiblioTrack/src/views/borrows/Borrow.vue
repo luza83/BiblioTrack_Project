@@ -36,7 +36,7 @@
               @input="onFilterChange()" v-model="getBooksFilter.title" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <input type="text" class="form-control form-control-sm" placeholder="Search byAuthor"
+            <input type="text" class="form-control form-control-sm" placeholder="Search by Author"
               @input="onFilterChange()" v-model="getBooksFilter.author" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -126,18 +126,16 @@ import borrowBookService from '@/services/borrowBookService.js'
 import BookModal from '@/components/modals/BookModal.vue'
 import { useAuthStore } from "@/stores/authStore";
 import { ref, onMounted, reactive } from 'vue'
-import { BORROW_DUE_DATE } from '@/constants/constants'
+import { BORROW_DUE_DATE, READY_FOR_PICKUP_TIME } from '@/constants/constants'
 import { useSwal } from '@/composables/swal'
 const { showError, showBorrowed } = useSwal()
 const availableBooks = reactive([])
 const loading = ref(false)
-const pickUpTime = 2 //hours
-const dueDate = new Date()
 const showFilters = ref(false);
 const authStore = useAuthStore()
 const showModal = ref(false)
 const selectedBook = ref(null)
-dueDate.setDate(dueDate.getDate() + BORROW_DUE_DATE)
+
 const getBooksFilter = reactive({
   title: '',
   author: '',
@@ -193,7 +191,7 @@ const borrowBook = async (book) => {
     if (!response) {
       showError(response.message || 'Failed to borrow book.')
     }
-    showBorrowed(`${book.title} is now reserved and will be ready to pick up in ${pickUpTime} hours \u{1F4D6}\u{1F60A} \nReturn by \n` + dueDate.toLocaleDateString())
+    showBorrowed(`${book.title} is now reserved and will be ready to pick up in ${READY_FOR_PICKUP_TIME} hours \u{1F4D6}\u{1F60A} \nReturn by \n` + BORROW_DUE_DATE)
     fetchAvailableBooks()
 
   } catch (error) {
