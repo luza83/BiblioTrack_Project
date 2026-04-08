@@ -9,7 +9,15 @@ export const CATEGROIES = [ 'Adventure',
                             'Post-Apocalyptic',
                             'Romance',
                             'Science Fiction',
-                            'Thriller']
+                            'Thriller',
+                            'Philosophy',
+                            'Biography',
+                            'Self-Help',
+                            'Health',
+                            'Travel',
+                            'Cooking',
+                            'Art',
+                            'Western']
 
 export const COPY_STATUS_AVAILABLE = 'Available'
 export const COPY_STATUS_BORROWED = 'Borrowed'
@@ -40,5 +48,9 @@ export const BORROW_STATUS = [
 
 
 export const ROLES = ['Admin', 'Visitor']
-
-export const BORROW_DUE_DATE = 15;
+const today = new Date()
+export const BORROW_DUE_DATE = today.setDate(today.getDate() + 15).toLocaleString();
+export const BORROW_RENEWAL_DAYS = 7;
+export const READY_FOR_PICKUP_TIME = 2; // hours
+export const PICKUP_TIME_LIMIT = 48; // hours
+export const MINIMUM_DAYS_FOR_RENEW = 3
