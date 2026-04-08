@@ -10,22 +10,14 @@
       <div class="mb-4 border-bottom d-flex justify-content-between align-items-center py-3">
         <h3 class="fw-semibold text-success"> {{ bookIdForUpdate ? 'Edit' : 'New' }} Book</h3>
         <div class="d-flex gap-3">
-          <button
-            type="submit"
-            form="menuForm"
-            class="btn btn-success btn-sm gap-2 rounded-1 px-4 py-2"
-            @click="router.push({ name: APP_ROUTE_NAMES.CREATE_BOOK })"
-            :disabled="isProcessing"
-          >
+          <button type="submit" form="menuForm" class="btn btn-success btn-sm gap-2 rounded-1 px-4 py-2"
+            @click="router.push({ name: APP_ROUTE_NAMES.CREATE_BOOK })" :disabled="isProcessing">
             <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
             {{ bookIdForUpdate ? 'Update' : 'Create' }} Book
           </button>
 
-          <button
-            type="button"
-            class="btn btn-outline border btn-sm gap-2 rounded-1 px-4 py-2"
-            @click="router.push({ name: APP_ROUTE_NAMES.BOOKS })"
-          >
+          <button type="button" class="btn btn-outline border btn-sm gap-2 rounded-1 px-4 py-2"
+            @click="router.push({ name: APP_ROUTE_NAMES.BOOKS })">
             Cancel
           </button>
         </div>
@@ -36,46 +28,26 @@
           <li v-for="error in errorList" :key="error">{{ error }}</li>
         </ul>
       </div>
-      <form
-        enctype="multipart/form-data"
-        class="needs-validation"
-        id="menuForm"
-        @submit="onFormSubmit"
-      >
+      <form enctype="multipart/form-data" class="needs-validation" id="menuForm" @submit="onFormSubmit">
         <div class="row g-4">
           <div class="col-lg-8">
             <div class="d-flex flex-column g-12">
               <div class="mb-3">
                 <label for="Title" class="form-label">Title</label>
-                <input
-                  id="name"
-                  type="text"
-                  v-model="bookObj.title"
-                  class="form-control"
-                  placeholder="Enter book title"
-                />
+                <input id="name" type="text" v-model="bookObj.title" class="form-control"
+                  placeholder="Enter book title" />
               </div>
 
               <div class="mb-3">
                 <label for="Author" class="form-label">Author</label>
-                <input
-                  id="Author"
-                  class="form-control"
-                  placeholder="Enter book author"
-                  v-model="bookObj.author"
-                  />
+                <input id="Author" class="form-control" placeholder="Enter book author" v-model="bookObj.author" />
               </div>
 
               <div class="mb-3">
                 <label for="ISBN" class="form-label">ISBN</label>
-                <input
-                  id="ISBN"
-                  type="text"
-                  class="form-control"
-                  v-model="bookObj.isbn"
-                />
+                <input id="ISBN" type="text" class="form-control" v-model="bookObj.isbn" />
               </div>
-            <div class="mb-3">
+              <div class="mb-3">
                 <label for="Publisher" class="form-label">Publisher</label>
                 <input id="Publisher" class="form-control" v-model="bookObj.publisher" />
               </div>
@@ -87,17 +59,21 @@
                   <option v-for="category in CATEGROIES" :key="category">{{ category }}</option>
                 </select>
               </div>
+              <div class="mb-3">
+                <label for="NumberOfPages" class="form-label">Number of Pages</label>
+                <input id="NumberOfPages" type="number" class="form-control" v-model="bookObj.numPages" />
+              </div>
+              <div class="mb-3">
+                <label for="Description" class="form-label">Description</label>
+                <textarea id="Description" class="form-control" v-model="bookObj.description" />
+              </div>
             </div>
           </div>
 
           <div class="col-lg-4">
             <div>
-              <img
-                v-if="bookIdForUpdate > 0 && bookObj.imageUrl"
-                :src="bookObj.imageUrl"
-                class="img-fluid w-100 mb-3 rounded"
-                style="aspect-ratio: 1/1; object-fit: cover"
-              />
+              <img v-if="bookIdForUpdate > 0 && bookObj.imageUrl" :src="bookObj.imageUrl"
+                class="img-fluid w-100 mb-3 rounded" style="aspect-ratio: 1/1; object-fit: cover" />
               <div class="mb-3">
                 <label for="image" class="form-label">Book Image</label>
                 <input id="image" class="form-control" v-model="bookObj.imageUrl" />
@@ -131,6 +107,8 @@ const bookObj = reactive({
   publisher: '',
   category: 0.0,
   imageUrl: '',
+  description: '',
+  numPages: 0,
 })
 const formData = new FormData()
 
@@ -140,7 +118,7 @@ onMounted(async () => {
   try {
     const result = await booksService.getBookById(bookIdForUpdate)
     Object.assign(bookObj, result)
-    console.log("bookObj:", bookObj)
+
   } catch (err) {
     console.log('Error while fetching book', err)
   } finally {
@@ -170,9 +148,12 @@ const onFormSubmit = async (event) => {
   if (bookObj.category === '') {
     errorList.push('Category must be selected.')
   }
+  if (bookObj.numPages <= 0) {
+    errorList.push('Number of pages should be greater than 0.')
+  }
   if (bookObj.imageUrl === '') {
-   errorList.push('Image url must be provided.')
-  } 
+    errorList.push('Image url must be provided.')
+  }
   if (!errorList.length) {
     //no errors
     Object.entries(bookObj).forEach(([key, value]) => {
@@ -189,7 +170,7 @@ const onFormSubmit = async (event) => {
         .catch((err) => {
           isProcessing.value = false
           showError(errorList.join(', ') || 'Book creation failed.')
-          console.log('erro list:',errorList)
+          console.log('erro list:', errorList)
         })
     } else {
       //update
@@ -205,7 +186,6 @@ const onFormSubmit = async (event) => {
           console.log('update Failed', err)
         })
     }
-    console.log(formData)
   }
   isProcessing.value = false
 }
