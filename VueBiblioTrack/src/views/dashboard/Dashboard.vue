@@ -1,101 +1,156 @@
 <template>
-    <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
-        <div class="spinner-grow text-primary-subtle" role="status">
-            <span class="visually-hidden">Loading...</span>
+    <div class="container px-3" v-if="!authStore.isAdmin">
+        <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
+            <div class="spinner-grow text-primary-subtle" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="dashboard" v-else>
+
+            <!-- APP TITLE / BRAND -->
+            <section class="app-header">
+                <div class="title-group d-flex flex-column">
+                    <h1 class="app-title">BiblioTrack: </h1>
+                    <p>From shelf to reader, made simple.</p>
+                </div>
+            </section>
+
+            <!-- RIGHT: FEATURE CARD -->
+            <section class="features d-flex gap-3 mb-5">
+
+                <div v-for="card in featuredCards" :key="card.id" class="feature-card">
+                    <span :class="card.icon"></span>
+                    <h4>{{ card.title }}</h4>
+                    <p>{{ card.description }}</p>
+                </div>
+            </section>
+            <section class="hero flex-fill" v-if="stats.bookOfTheDay">
+                <img :src="stats.bookOfTheDay.imageUrl" class="hero-cover"
+                    @click="showBookDetails(stats.bookOfTheDay.bookId)" style="cursor:pointer;" />
+                <div class="hero-info">
+                    <span>Book of the Day <i class="bi bi-star-fill text-warning"></i></span>
+                    <h1>{{ stats.bookOfTheDay.title }}</h1>
+                    <p class="author">{{ stats.bookOfTheDay.author }}</p>
+                    <p class="description">
+                        {{ stats.bookOfTheDay.description }}
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- TRENDING BOOKS (NETFLIX STYLE ROW) -->
+            <section class="book-row mb-5" v-if="stats.trendingBooks.length > 0">
+                <h3><i class="bi bi-fire"></i> Trending</h3>
+
+                <div class="scroll-row">
+                    <div v-for="book in stats.trendingBooks" :key="book.id" class="book-card">
+                        <div class="card h-100 shadow-sm">
+                            <div class="position-relative">
+                                <img :src="book.imageUrl" class="object-fit-cover" alt="Book"
+                                    @click="showBookDetails(book.bookId)" style="height: 200px; cursor: pointer;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- RECENT BOOKS -->
+            <section class="book-row">
+                <h3><i class="bi bi-clock"></i> Recently Added</h3>
+
+                <div class="scroll-row">
+                    <div v-for="book in stats.newBooks" :key="book.id" class="book-card">
+                        <div class="card h-100 shadow-sm">
+                            <div class="position-relative">
+                                <img :src="book.imageUrl" class=" object-fit-cover" alt="Book"
+                                    @click="showBookDetails(book.bookId)" style="height: 200px; cursor: pointer;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- STATS -->
+            <section class="stats">
+                <div class="stat-card">
+                    <h2>{{ stats.bookCount }}</h2>
+                    <p>Books in Library</p>
+                </div>
+
+                <div class="stat-card">
+                    <h2>{{ stats.borrowedBookCount }}</h2>
+                    <p>Total Borrows</p>
+                </div>
+
+                <div class="stat-card">
+                    <h2>{{ stats.favoriteBookCount }}</h2>
+                    <p>Favorites Saved</p>
+                </div>
+
+                <div class="stat-card">
+                    <h2>{{ stats.reservedBookCount }}</h2>
+                    <p>Active Reservations</p>
+                </div>
+            </section>
+
+            <BookModal :show="showModal" :book-id="selectedBook" @borrow="borrowBook" @favorite="toggleFavorites"
+                @close="closeModal" />
         </div>
     </div>
-    <div class="dashboard" v-else>
-
-        <!-- APP TITLE / BRAND -->
-        <section class="app-header">
-            <div class="title-group d-flex flex-column">
-                <h1 class="app-title">BiblioTrack: </h1>
-                <p>From shelf to reader, made simple.</p>
+    <div class="container px-3" v-else>
+        <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
+            <div class="spinner-grow text-primary-subtle" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-        </section>
-
-        <!-- RIGHT: FEATURE CARD -->
-        <section class="features d-flex gap-3 mb-5">
-
-            <div v-for="card in featuredCards" :key="card.id" class="feature-card">
-                <span :class="card.icon"></span>
-                <h4>{{ card.title }}</h4>
-                <p>{{ card.description }}</p>
-            </div>
-        </section>
-        <section class="hero flex-fill" v-if="stats.bookOfTheDay">
-            <img :src="stats.bookOfTheDay.imageUrl" class="hero-cover" @click="showBookDetails(stats.bookOfTheDay.bookId)"
-                style="cursor:pointer;" />
-            <div class="hero-info">
-                <span>Book of the Day <i class="bi bi-star-fill text-warning"></i></span>
-                <h1>{{ stats.bookOfTheDay.title }}</h1>
-                <p class="author">{{ stats.bookOfTheDay.author }}</p>
-                <p class="description">
-                    {{ stats.bookOfTheDay.description }}
-                </p>
-            </div>
-        </section>
+        </div>
+        <div class="dashboard" v-else>
 
 
-        <!-- TRENDING BOOKS (NETFLIX STYLE ROW) -->
-        <section class="book-row mb-5" v-if="stats.trendingBooks.length > 0">
-            <h3><i class="bi bi-fire"></i> Trending</h3>
-
-            <div class="scroll-row">
-                <div v-for="book in stats.newBooks" :key="book.id" class="book-card">
-                    <div class="card h-100 shadow-sm">
-                        <div class="position-relative">
-                            <img :src="book.imageUrl" class="object-fit-cover" alt="Book"
-                                @click="showBookDetails(book.bookId)" style="height: 200px; cursor: pointer;" />
-                        </div>
-                    </div>
+            <section class="app-header">
+                <div class="title-group d-flex flex-column">
+                    <h1 class="app-title">BiblioTrack: </h1>
+                    <p>From shelf to reader, made simple.</p>
                 </div>
-            </div>
-        </section>
+            </section>
 
 
-        <!-- RECENT BOOKS -->
-        <section class="book-row">
-            <h3><i class="bi bi-clock"></i> Recently Added</h3>
+            <section class="features d-flex gap-3 mb-5">
 
-            <div class="scroll-row">
-                <div v-for="book in stats.newBooks" :key="book.id" class="book-card">
-                    <div class="card h-100 shadow-sm">
-                        <div class="position-relative">
-                            <img :src="book.imageUrl" class=" object-fit-cover" alt="Book"
-                                @click="showBookDetails(book.bookId)" style="height: 200px; cursor: pointer;" />
-                        </div>
-                    </div>
+                <div v-for="card in featuredCardsAdmin" :key="card.id" class="feature-card">
+                    <span :class="card.icon"></span>
+                    <h4>{{ card.title }}</h4>
+                    <p>{{ card.description }}</p>
                 </div>
-            </div>
-        </section>
+            </section>
+            
+            <!-- STATS ADMIN -->
+            <section class="stats">
+                <div class="stat-card">
+                    <h2>{{ stats.bookCount }}</h2>
+                    <p>Books in Library</p>
+                </div>
 
+                <div class="stat-card">
+                    <h2>{{ stats.borrowedBookCount }}</h2>
+                    <p>Total Borrows</p>
+                </div>
 
-        <!-- STATS -->
-        <section class="stats">
-            <div class="stat-card">
-                <h2>{{ stats.bookCount }}</h2>
-                <p>Books in Library</p>
-            </div>
+                <div class="stat-card">
+                    <h2>{{ stats.favoriteBookCount }}</h2>
+                    <p>Favorites Saved</p>
+                </div>
 
-            <div class="stat-card">
-                <h2>{{ stats.borrowedBookCount }}</h2>
-                <p>Total Borrows</p>
-            </div>
+                <div class="stat-card">
+                    <h2>{{ stats.reservedBookCount }}</h2>
+                    <p>Active Reservations</p>
+                </div>
+            </section>
 
-            <div class="stat-card">
-                <h2>{{ stats.favoriteBookCount }}</h2>
-                <p>Favorites Saved</p>
-            </div>
-
-            <div class="stat-card">
-                <h2>{{ stats.reservedBookCount }}</h2>
-                <p>Active Reservations</p>
-            </div>
-        </section>
-
-        <BookModal :show="showModal" :book-id="selectedBook" @borrow="borrowBook" @favorite="toggleFavorites"
-            @close="closeModal" />
+            <BookModal :show="showModal" :book-id="selectedBook" @borrow="borrowBook" @favorite="toggleFavorites"
+                @close="closeModal" />
+        </div>
     </div>
 </template>
 
@@ -149,6 +204,28 @@ const featuredCards = [
         description: 'Reserve and collect books easily.'
     }
 ]
+const featuredCardsAdmin = [
+    {
+        icon: 'bi bi-book bi-book-fill text-success',
+        title: 'Manage Books',
+        description: 'Add, delete or edit library books.'
+    },
+    {
+        icon: 'bi bi-bookshelf bi-bookshelf-fill text-primary',
+        title: 'Manage Book Stock',
+        description: 'Add, delete or edit book copies.'
+    },
+    {
+        icon: 'bi bi-person-vcard bi-person-vcard-fill text-danger',
+        title: 'Manage User Books',
+        description: 'Track user borrows, returns and favorites.'
+    },
+    {
+        icon: 'bi bi-person bi-person-fill text-danger',
+        title: 'Manage Users',
+        description: 'Add, delete or edit library users'
+    }
+]
 let userFavoriteBookRequest = {
     userId: authStore.currentUserId,
     bookId: null
@@ -189,7 +266,7 @@ const borrowBook = async (book) => {
             path: APP_ROUTE_NAMES.SIGN_IN,
             query: { redirect: route.fullPath }
         })
-        
+
         return
     }
     try {
