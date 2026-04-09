@@ -44,8 +44,8 @@
               v-model="getBooksFilter.isbn" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <input type="text" class="form-control form-control-sm" placeholder="Search by Publisher"
-              @input="onFilterChange()" v-model="getBooksFilter.publisher" />
+            <input type="text" class="form-control form-control-sm" placeholder="Search by Category"
+              @input="onFilterChange()" v-model="getBooksFilter.category" />
           </div>
         </div>
       </div>
