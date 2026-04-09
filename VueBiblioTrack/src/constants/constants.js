@@ -1,3 +1,4 @@
+import moment from "moment"
 export const CATEGROIES = [ 'Adventure',
                             'Comedy',
                             'Drama',
@@ -48,8 +49,7 @@ export const BORROW_STATUS = [
 
 
 export const ROLES = ['Admin', 'Visitor']
-const today = new Date()
-export const BORROW_DUE_DATE = today.setDate(today.getDate() + 15).toLocaleString();
+export const BORROW_DUE_DATE = moment().add(15, 'days').format('YYYY-MM-DD').toLocaleString();
 export const BORROW_RENEWAL_DAYS = 7;
 export const READY_FOR_PICKUP_TIME = 2; // hours
 export const PICKUP_TIME_LIMIT = 48; // hours
