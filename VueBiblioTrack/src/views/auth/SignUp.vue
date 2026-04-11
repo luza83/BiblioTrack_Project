@@ -13,20 +13,13 @@
 
             <form @submit.prevent="onSignUpSubmit">
               <div class="mb-3">
-                <label for="name" class="form-label">Full Name</label>
+                <label for="name" class="form-label">User Name</label>
                 <input type="text" class="form-control" id="name" v-model="formObj.name" />
               </div>
 
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" v-model="formObj.email" />
-              </div>
-
-              <div class="mb-3">
-                <label for="role" class="form-label">Role</label>
-                <select class="form-select" id="role" v-model="formObj.role">
-                  <option v-for="role in ROLES" :key="role">{{ role }}</option>
-                </select>
               </div>
 
               <div class="mb-3">
@@ -62,7 +55,6 @@
 </template>
 
 <script setup>
-import { ROLES } from '@/constants/constants'
 import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import { useAuthStore } from '@/stores/authStore'
 import { reactive, ref } from 'vue'
@@ -81,7 +73,6 @@ const errorList = reactive([])
 const onSignUpSubmit = async () => {
   isLoading.value = true
   errorList.length = 0
-  console.log(formObj)
   if (formObj.name === undefined || formObj.name.length === 0) {
     errorList.push('Name is required.')
   }
