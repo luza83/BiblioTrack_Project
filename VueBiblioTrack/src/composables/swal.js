@@ -28,7 +28,7 @@ export function useSwal() {
       theme: themeStore.theme,
       backdrop: backdropColor,
       showConfirmButton: false,
-      timer: 1500,
+      timer: 2500,
     })
   }
 
@@ -38,7 +38,7 @@ export function useSwal() {
       text: message,
       icon: 'warning',
       showCancelButton: true,
-      themeStore: themeStore.theme,
+      theme: themeStore.theme,
       backdrop: backdropColor,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
