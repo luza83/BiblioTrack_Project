@@ -119,12 +119,14 @@
             <section class="features d-flex gap-3 mb-5">
 
                 <div v-for="card in featuredCardsAdmin" :key="card.id" class="feature-card">
-                    <span :class="card.icon"></span>
-                    <h4>{{ card.title }}</h4>
-                    <p>{{ card.description }}</p>
+                    <div @click="router.push({ name: card.linkTo })" style="cursor:pointer;">
+                        <span :class="card.icon"></span>
+                        <h4>{{ card.title }}</h4>
+                        <p>{{ card.description }}</p>
+                    </div>
                 </div>
             </section>
-            
+
             <!-- STATS ADMIN -->
             <section class="stats">
                 <div class="stat-card">
@@ -208,22 +210,26 @@ const featuredCardsAdmin = [
     {
         icon: 'bi bi-book bi-book-fill text-success',
         title: 'Manage Books',
-        description: 'Add, delete or edit library books.'
+        description: 'Add, delete or edit library books.',
+        linkTo: APP_ROUTE_NAMES.BOOKS
     },
     {
         icon: 'bi bi-bookshelf bi-bookshelf-fill text-primary',
         title: 'Manage Book Stock',
-        description: 'Add, delete or edit book copies.'
+        description: 'Add, delete or edit book copies.',
+        linkTo: APP_ROUTE_NAMES.BOOK_STOCK
     },
     {
         icon: 'bi bi-person-vcard bi-person-vcard-fill text-danger',
         title: 'Manage User Books',
-        description: 'Track user borrows, returns and favorites.'
+        description: 'Track user borrows, returns and favorites.',
+        linkTo: APP_ROUTE_NAMES.USERS
     },
     {
         icon: 'bi bi-person bi-person-fill text-danger',
         title: 'Manage Users',
-        description: 'Add, delete or edit library users'
+        description: 'Add, delete or edit library users',
+        linkTo: APP_ROUTE_NAMES.USERS
     }
 ]
 let userFavoriteBookRequest = {
