@@ -10,7 +10,7 @@
       <div class="mb-4 border-bottom d-flex justify-content-between align-items-center py-3">
         <h3 class="fw-semibold text-success"> {{ bookIdForUpdate ? 'Edit' : 'New' }} Book</h3>
         <div class="d-flex gap-3">
-          <button type="submit" form="menuForm" class="btn btn-success btn-sm gap-2 rounded-1 px-4 py-2"
+          <button type="submit" form="bookForm" class="btn btn-success btn-sm gap-2 rounded-1 px-4 py-2"
             @click="router.push({ name: APP_ROUTE_NAMES.CREATE_BOOK })" :disabled="isProcessing">
             <span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
             {{ bookIdForUpdate ? 'Update' : 'Create' }} Book
@@ -28,7 +28,7 @@
           <li v-for="error in errorList" :key="error">{{ error }}</li>
         </ul>
       </div>
-      <form enctype="multipart/form-data" class="needs-validation" id="menuForm" @submit="onFormSubmit">
+      <form enctype="multipart/form-data" class="needs-validation" id="bookForm" @submit="onFormSubmit">
         <div class="row g-4">
           <div class="col-lg-8">
             <div class="d-flex flex-column g-12">

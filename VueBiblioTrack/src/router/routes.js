@@ -9,6 +9,7 @@ import BookUpsert from '@/views/books/BookUpsert.vue'
 import BookStock from '@/views/bookCopies/BookStock.vue'
 import BookCopies from '@/views/bookCopies/BookCopies.vue'
 import Users from '@/views/users/Users.vue'
+import UserUpsert from '@/views/users/UserUpsert.vue'
 import Borrow from '@/views/borrows/Borrow.vue'
 import MyBooks from '@/views/myBooks/MyBooks.vue'
 import { requireAuth } from '@/router/guards'
@@ -74,6 +75,19 @@ const router = createRouter({
       path: '/admin/manage-users',
       name: APP_ROUTE_NAMES.USERS,
       component: Users,
+      beforeEnter: [requireAdmin],
+    },
+    {
+      path: '/admin/manage-users/create',
+      name: APP_ROUTE_NAMES.CREATE_USER,
+      component: UserUpsert,
+      beforeEnter: [requireAdmin],
+    },
+    {
+      path: '/admin/manage-users/update/:userId',
+      name: APP_ROUTE_NAMES.EDIT_USER,
+      component: UserUpsert,
+      props: true,
       beforeEnter: [requireAdmin],
     },
     {

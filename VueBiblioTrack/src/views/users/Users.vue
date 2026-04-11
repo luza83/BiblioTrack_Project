@@ -13,7 +13,15 @@
             <h2 class="h5 text-primary-subtle">Users</h2>
             <p class="mb-0 text-muted small">Manage users in BiblioTrack</p>
           </div>
+          <div>
+            <button class="btn btn-primary-subtle btn-sm gap-2 rounded-1 px-4 py-2"
+              @click="router.push({ name: APP_ROUTE_NAMES.CREATE_USER })">
+              <i class="bi bi-plus-square"></i> &nbsp;
+              <span>Add User</span>
+            </button>
+          </div>
         </div>
+
         <div class="card-body p-3">
 
           <div class="mb-3">
@@ -41,15 +49,11 @@
               <thead>
                 <tr>
                   <th class="ps-3 small text-muted">Name</th>
-                  <th class="small text-muted no-cursor"
-                    :class="selectedBookList == 'reserved' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''">
-                    Reserved Books</th>
-                  <th class="small text-muted no-cursor"
-                    :class="selectedBookList == 'borrowed' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''">
-                    Borrowed Books</th>
-                  <th class="small text-muted no-cursor"
-                    :class="selectedBookList == 'favorite' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''">
-                    Favorites</th>
+                  <th class="small text-muted no-cursor">Reserved Books </th>
+                  <th class="small text-muted no-cursor">Borrowed Books</th>
+                  <th class="small text-muted no-cursor">Favorites</th>
+                  <th class="pe-3 text-end small text-muted">
+                    Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -61,30 +65,52 @@
                       </span>
                     </td>
                     <td class="fw-semibold small"
-                      :class="selectedBookList == 'reserved' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
+                      :class="expandedUserId === user.userId && selectedBookList === 'reserved' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
                       @click.stop="displayDetails(user.userId, 'reserved', user.reservedBooks)" style="cursor: pointer;">
                       {{ user.reservedBooks.length }}
+                      &nbsp;
+                      <i :class="expandedUserId === user.userId && selectedBookList === 'reserved' ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
                     </td>
 
                     <td class="fw-semibold small"
-                      :class="selectedBookList == 'borrowed' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
+                      :class="expandedUserId === user.userId && selectedBookList === 'borrowed' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
                       @click.stop="displayDetails(user.userId, 'borrowed', user.borrowedBooks)" style="cursor: pointer;">
                       {{ user.borrowedBooks.length }}
+                      &nbsp;
+                      <i :class="expandedUserId === user.userId && selectedBookList === 'borrowed' ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
                     </td>
 
                     <td class="fw-semibold small"
-                      :class="selectedBookList == 'favorite' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
+                      :class="expandedUserId === user.userId && selectedBookList === 'favorite' ? 'bg-primary-subtle bg-opacity-10 text-primary-subtle' : ''"
                       @click.stop="displayDetails(user.userId, 'favorite', user.favoriteBooks)" style="cursor: pointer;">
                       {{ user.favoriteBooks.length }}
+                      &nbsp;
+                      <i :class="expandedUserId === user.userId && selectedBookList === 'favorite' ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
+                    </td>
+                    <td class="pe-3 text-end">
+                      <div class="d-flex gap-2 justify-content-end">
+                        <button class="btn btn-sm btn-outline-primary-subtle" @click="
+                          router.push({
+                            name: APP_ROUTE_NAMES.EDIT_USER,
+                            params: { userId: user.userId },
+                          })
+                          ">
+                          <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" @click="handleUserDelete(user.userId)">
+                          <i class="bi bi-trash-fill"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr v-if="expandedUserId === user.userId" class="table-borderless table-active">
-                    <td colspan="4">
+                    <td colspan="5">
                       <table class="table table-sm  mb-0">
                         <thead>
                           <tr>
                             <th class="small text-muted">Title</th>
                             <th class="small text-muted">Actions</th>
+                            <th></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -96,7 +122,10 @@
                                   @click.stop="updateUserBook(BORROW_STATUS_AVAILABLE, item)">
                                   Remove from reserved
                                 </button>
-                                <button class="btn btn-sm btn-danger me-2" @click.stop="addToFavorites(item.book.bookId)">
+                                <button 
+                                  v-if="isSelectedUserFavorite(item.book.bookId)"
+                                  class="btn btn-sm btn-danger me-2" 
+                                  @click.stop="addToFavorites(item.book.bookId)">
                                   Add to favorites
                                 </button>
                                 <button class="btn btn-sm btn-success"
@@ -114,12 +143,14 @@
                                 <button class="btn btn-sm btn-danger me-2" @click.stop="removeFromFavorites(item.bookId)">
                                   Remove from favorites
                                 </button>
-                                <button v-if="item.isBorrowable" class="btn btn-sm btn-success" @click.stop="borrowFavoriteBook(BORROW_STATUS_BORROWED, item.bookId)">
+                                <button v-if="item.isBorrowable" class="btn btn-sm btn-success"
+                                  @click.stop="borrowFavoriteBook(BORROW_STATUS_BORROWED, item.bookId)">
                                   Borrow
                                 </button>
                               </div>
 
                             </td>
+                            <td></td>
                           </tr>
                         </tbody>
                       </table>
@@ -137,18 +168,24 @@
 <script setup>
 import usersActivityService from '@/services/usersActivityService.js'
 import { ref, onMounted, reactive } from 'vue'
-import {  BORROW_STATUS,
-          BORROW_STATUS_AVAILABLE, 
-          BORROW_STATUS_BORROWED, 
-          BORROW_STATUS_RESERVED, 
-          BORROW_STATUS_OVERDUE, 
-          BORROW_STATUS_RETURNED } from '@/constants/constants'
+import { useRouter, useRoute } from 'vue-router';
+import { APP_ROUTE_NAMES } from '@/constants/routeNames'
+import usersService from '@/services/usersService.js'
+import {
+  BORROW_STATUS,
+  BORROW_STATUS_AVAILABLE,
+  BORROW_STATUS_BORROWED,
+  BORROW_STATUS_RESERVED,
+  BORROW_STATUS_OVERDUE,
+  BORROW_STATUS_RETURNED
+} from '@/constants/constants'
 import borrowBookService from '@/services/borrowBookService.js'
 import userFavoritesService from '@/services/userFavoritesService.js'
 import { useSwal } from '@/composables/swal'
 
 import moment from 'moment'
 
+const router = useRouter()
 const { showConfirm, showError, showSuccess, showConfirmBorrowStatus } = useSwal();
 const books = reactive([]);
 const loading = ref(false);
@@ -203,6 +240,12 @@ function displayDetails(userId, listType, objList) {
   selectedBookList.value = listType
   currentDetails.value = objList
 }
+function isSelectedUserFavorite(bookId){
+  let test = currentDetails.value
+ // return true
+  let selectedFavorites = users.find(user => user.userId === expandedUserId.value)?.favoriteBooks || []
+  return !selectedFavorites.some(fav => fav.bookId === bookId)
+}
 const updateUserBook = async (newStatus, borrow) => {
   try {
     if (borrow.status != newStatus) {
@@ -239,7 +282,7 @@ const borrowFavoriteBook = async (borrowStatus, bookId) => {
       bookId: bookId,
       userId: expandedUserId.value
     }
-    const response = await borrowBookService.borrowBook(request,true)
+    const response = await borrowBookService.borrowBook(request, true)
     if (!response) {
       showError(response.message || 'Failed to borrow book.')
     }
@@ -271,7 +314,6 @@ const addToFavorites = (bookId) => {
   if (userFavoritesService.addBookToUserFavorites(request)) {
     fetchUsers()
     expandedUserId.value = null
-    //selectedBook.classList.add('text-danger');
   }
 
 }
@@ -283,8 +325,27 @@ const removeFromFavorites = (bookId) => {
   if (userFavoritesService.removeBookFromUserFavorites(request)) {
     fetchUsers()
     expandedUserId.value = null
-    //selectedBook.classList.remove('text-danger');
+  
+  }
+}
+const handleUserDelete = async (userId) => {
+  try {
+    const confirmed = await showConfirm('Are you sure you want to delete this user? This action cannot be undone.')
+    if (confirmed.isConfirmed) {
+      // Call the API to delete the user
+      const response = await usersService.deleteUser(userId)
+      if (response === true) {
+        showSuccess('User deleted successfully!')
+        fetchUsers()
+      } else {
+        showError(response.join(", "))
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    showError('An error occurred while deleting the user.')
   }
 }
 
-</script>@/services/usersActivityService.js
+</script>
+
