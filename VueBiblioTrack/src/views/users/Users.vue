@@ -134,6 +134,10 @@
                                 </button>
                               </div>
                               <div v-else-if="selectedBookList == 'borrowed'" class="text-start">
+                                <span v-if="item.isOverdue" class="text-danger">
+                                  Due date &nbsp; {{ moment(item.dueDate).format('dddd, MM, yyyy') }} 
+                                  <i class="bi bi-exclamation-triangle text-warning m-2"></i>
+                                </span>
                                 <button class="btn btn-sm btn-warning"
                                   @click.stop="updateUserBook(BORROW_STATUS_RETURNED, item)">
                                   Return
