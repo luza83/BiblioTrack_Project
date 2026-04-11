@@ -99,7 +99,7 @@ const userObj = reactive({
     resetPassword: false,
     email: '',
     role: 'Customer',
-   
+
 })
 const formData = new FormData()
 
@@ -120,7 +120,7 @@ onMounted(async () => {
 const onFormSubmit = async (event) => {
     event.preventDefault()
     isProcessing.value = true
-    errorList.length = 0 
+    errorList.length = 0
     if (userObj.userName === undefined || userObj.userName.length === 0) {
         errorList.push('Name is required.')
     }
@@ -135,17 +135,17 @@ const onFormSubmit = async (event) => {
         return
     }
     Object.entries(userObj).forEach(([key, value]) => {
-      formData.append(key, value)
+        formData.append(key, value)
     })
-    if(userIdForUpdate) {
+    if (userIdForUpdate) {
         //update
         try {
             const response = await usersService.updateUser(userIdForUpdate, formData)
             if (response) {
-                showSuccess('User updated successfully!') 
+                showSuccess('User updated successfully!')
                 isProcessing.value = false;
             }
-               
+
         } catch (err) {
             errorList.push(err)
         } finally {
@@ -155,20 +155,27 @@ const onFormSubmit = async (event) => {
     }
     else {
         //create
+        const userObjForSignUp = {
+            email: userObj.email,
+            password: userObj.password,
+            name: userObj.userName,
+            role: userObj.role
+        }
 
-            try {
-                const response = await authService.signUp(userObj)
-                if (response.success) {
-                    showSuccess('User registered successfully!')
-                    isProcessing.value = false;
-                    router.push({ name: APP_ROUTE_NAMES.USERS }) 
-                }
-                
-            } catch (err) {
-                errorList.push(err)
-            } finally {
-                loading.value = false
-            }}
+        try {
+            const response = await authService.signUp(userObjForSignUp)
+            if (response.success) {
+                showSuccess('User registered successfully!')
+                isProcessing.value = false;
+                router.push({ name: APP_ROUTE_NAMES.USERS })
+            }
+
+        } catch (err) {
+            errorList.push(err)
+        } finally {
+            loading.value = false
+        }
+    }
 
 }
 </script>
