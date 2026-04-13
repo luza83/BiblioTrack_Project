@@ -1,4 +1,4 @@
-# 🚀 BiblioTrack App (Frontend)
+# 📚 BiblioTrack App (Frontend)
 
 Frontend application for the BiblioTrack library management system.  
 This app allows users to browse, reserve, and manage books through a responsive and intuitive interface.
