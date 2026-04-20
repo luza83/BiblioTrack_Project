@@ -1,8 +1,8 @@
 <template>
-    <nav class="navbar navbar-expand-md rounded-3 mx-auto my-2 w-100 bg-primary-subtle bg-opacity-10 text-primary-subtle">
+    <nav class="navbar navbar-expand-md navbar-light rounded-3 mx-auto my-2 w-100 bg-primary-subtle bg-opacity-10 text-primary-subtle">
         <div class="container-fluid">
-            <router-link class="navbar-brand" :to="APP_ROUTE_NAMES.DASHBOARD">
-                <img src="@/assets/logo.png" alt="Logo" height="64px" class="d-inline-block align-text-top me-2">
+            <router-link class="navbar-brand d-flex align-items-center" :to="APP_ROUTE_NAMES.DASHBOARD">
+                <img src="@/assets/logo.png" alt="Logo" class="img-fluid d-inline-block align-text-top me-2" style="max-height: 48px;">
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,25 +22,25 @@
                         <router-link class="nav-link" aria-current="page" :to="{ name: APP_ROUTE_NAMES.MY_BOOKS }">My Books
                         </router-link>
                     </li>
-                    <li class="nav-item dropdown" v-if="authStore.isAdmin">
+                    <li class="nav-item" v-if="authStore.isAdmin">
                         <router-link class="nav-link" aria-current="page" :to="{ name: APP_ROUTE_NAMES.BOOKS }">Books
                         </router-link>
                     </li>
-                    <li class="nav-item dropdown" v-if="authStore.isAdmin">
+                    <li class="nav-item" v-if="authStore.isAdmin">
                         <router-link class="nav-link" aria-current="page" :to="{ name: APP_ROUTE_NAMES.BOOK_STOCK }">Book
                             Stock
                         </router-link>
                     </li>
-                    <li class="nav-item dropdown" v-if="authStore.isAdmin">
+                    <li class="nav-item" v-if="authStore.isAdmin">
                         <hr class="dropdown-divider">
                     </li>
-                    <li class="nav-item dropdown" v-if="authStore.isAdmin">
+                    <li class="nav-item" v-if="authStore.isAdmin">
                         <router-link class="nav-link" aria-current="page" :to="{ name: APP_ROUTE_NAMES.USERS }">Users
                         </router-link>
                     </li>
                     
                 </ul>
-                <ul class="navbar-nav ms-auto align-items-center small">
+                <ul class="navbar-nav ms-auto  small">
                     <li class="nav-item" v-if="!authStore.isAuthenticated">
                         <router-link class="nav-link" aria-current="page" :to="{ name: APP_ROUTE_NAMES.SIGN_IN }"
                             title="Sign In">Sign In</router-link>
@@ -50,7 +50,7 @@
                             title="Sign Up">Sign Up</router-link>
                     </li>
                     <li class="nav-item" v-if="authStore.isAuthenticated">
-                        <button class="nav-link px-2" aria-current="page" title="Logout" @click="authStore.signOut()">
+                        <button class="nav-link" aria-current="page" title="Logout" @click="authStore.signOut()">
                             Sign Out
                         </button>
                     </li>

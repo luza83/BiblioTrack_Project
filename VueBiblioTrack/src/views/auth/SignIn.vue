@@ -1,14 +1,13 @@
 <template>
   <div class="container mt-3">
     <div class="row justify-content-center">
-      <div class="col-md-10">
-        <div class="card shadow d-flex flex-row">
+      <div class="col-12 col-md-10 col-lg-8">
+        <div class="card shadow signin-card overflow-hidden">
           <img
             src="@/assets/hero.jpg"
             class="card-img-left img-fluid"
-            style="width: 50%; object-fit: cover;"
           />
-          <div class="card-body p-5" style="width: 50%">
+          <div class="card-body p-4 p-md-5">
             <h2 class="text-center mb-4">Sign In</h2>
             <form @submit.prevent="onSignInSubmit">
               <div class="mb-3">
@@ -93,3 +92,26 @@ const onSignInSubmit = async () => {
   }
 }
 </script>
+
+<style scoped>
+.signin-card {
+  display: flex;
+  flex-direction: column;
+}
+.signin-card .card-img-left {
+  width: 100%;
+  object-fit: cover;
+}
+.signin-card .card-body {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .signin-card {
+    flex-direction: row;
+  }
+  .signin-card .card-img-left,
+  .signin-card .card-body {
+    width: 50%;
+  }
+}
+</style>

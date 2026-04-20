@@ -10,112 +10,124 @@
             <h1>{{ userOverview.userName }}</h1>
         </header>
 
-        <div class="grid container my-4">
+        <div class="container-fluid px-3">
             <!-- Borrowed Books -->
-            <section class="card mb-3 p-3 border-3">
-                <h4>Borrowed Books</h4>
-                <table v-if="userOverview.borrowedBooks.length" class="table-responsive table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Borrow Date</th>
-                            <th>Due Date</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in userOverview.borrowedBooks" :key="item.book.id">
-                            <td class="ps-3 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2 p-2"
-                                        style="width: 50px; height: 50px" />
-                                    <div>
-                                        <div class="fw-semibold small">{{ item.book.title }}</div>
+            <section class="card mb-4 p-3 border-3">
+                <h4 class="mb-3">Borrowed Books</h4>
+                <div v-if="userOverview.borrowedBooks.length" class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Borrow Date</th>
+                                <th>Due Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in userOverview.borrowedBooks" :key="item.book.id">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2"
+                                            style="width: 40px; height: 40px;" />
+                                        <div>
+                                            <div class="fw-semibold small">{{ item.book.title }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>{{ formatDate(item.borrowDate) }}</td>
-                            <td :class="item.isOverdue ? 'text-danger' : ''">{{ item.isOverdue ? formatDate(item.dueDate) + ' ⚠' : formatDate(item.dueDate) }}</td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-primary me-2" v-if="!item.isOverdue && renewable(item)"
-                                    @click="updateUserBook(BORROW_STATUS_BORROWED, item, true)">Renew</button>
-                                <button class="btn btn-sm btn-outline-danger"
-                                    @click="updateUserBook(BORROW_STATUS_RETURNED, item, false)">Return</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p v-else class="text-muted justify-content-center align-items-center text-center">No borrowed books</p>
+                                </td>
+                                <td class="small">{{ formatDate(item.borrowDate) }}</td>
+                                <td class="small" :class="item.isOverdue ? 'text-danger' : ''">{{ item.isOverdue ? formatDate(item.dueDate) + ' ⚠' : formatDate(item.dueDate) }}</td>
+                                <td class="text-end">
+                                    <div class="d-flex flex-column flex-sm-row gap-1 gap-sm-2 justify-content-end">
+                                        <button class="btn btn-sm btn-outline-primary" v-if="!item.isOverdue && renewable(item)"
+                                            @click="updateUserBook(BORROW_STATUS_BORROWED, item, true)">Renew</button>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            @click="updateUserBook(BORROW_STATUS_RETURNED, item, false)">Return</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p v-else class="text-muted text-center py-3 mb-0">No borrowed books</p>
             </section>
 
             <!-- Reserved Books -->
-            <section class="card mb-3 p-3 border-3">
-                <h4>Reserved Books</h4>
-                <table v-if="userOverview.reservedBooks.length" class="table-responsive table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Reserved Date</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in userOverview.reservedBooks" :key="item.book.id">
-                            <td class="ps-3 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2 p-2"
-                                        style="width: 50px; height: 50px" />
-                                    <div>
-                                        <div class="fw-semibold small">{{ item.book.title }}</div>
+            <section class="card mb-4 p-3 border-3">
+                <h4 class="mb-3">Reserved Books</h4>
+                <div v-if="userOverview.reservedBooks.length" class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Reserved Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in userOverview.reservedBooks" :key="item.book.id">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2"
+                                            style="width: 40px; height: 40px;" />
+                                        <div>
+                                            <div class="fw-semibold small">{{ item.book.title }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>{{ formatDate(item.borrowDate) }}</td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-danger me-2"
-                                    @click="updateUserBook(BORROW_STATUS_AVAILABLE, item, false)">Remove</button>
-                                <button class="btn btn-sm btn-outline-primary"
-                                    @click="updateUserBook(BORROW_STATUS_BORROWED, item, false)">Pick Up</button>
-                            </td>
-                        </tr>
-                    </tbody>
+                                </td>
+                                <td class="small">{{ formatDate(item.borrowDate) }}</td>
+                                <td class="text-end">
+                                    <div class="d-flex flex-column flex-sm-row gap-1 gap-sm-2 justify-content-end">
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            @click="updateUserBook(BORROW_STATUS_AVAILABLE, item, false)">Remove</button>
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            @click="updateUserBook(BORROW_STATUS_BORROWED, item, false)">Pick Up</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
 
-                </table>
-                <p v-else class="text-muted justify-content-center align-items-center text-center">No reserved books</p>
+                    </table>
+                </div>
+                <p v-else class="text-muted text-center py-3 mb-0">No reserved books</p>
             </section>
 
             <!-- Favorite Books -->
-            <section class="card mb-3 p-3 border-3">
-                <h4>Favorite Books</h4>
-                <table v-if="userOverview.favoriteBooks.length" class="table-responsive table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in userOverview.favoriteBooks" :key="item.book.id">
-                            <td class="ps-3 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2 p-2"
-                                        style="width: 50px; height: 50px" />
-                                    <div>
-                                        <div class="fw-semibold small">{{ item.book.title }}</div>
+            <section class="card mb-4 p-3 border-3">
+                <h4 class="mb-3">Favorite Books</h4>
+                <div v-if="userOverview.favoriteBooks.length" class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in userOverview.favoriteBooks" :key="item.book.id">
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <img :src="item.book.imageUrl" alt="Book" class="rounded object-fit-cover me-2"
+                                            style="width: 40px; height: 40px;" />
+                                        <div>
+                                            <div class="fw-semibold small">{{ item.book.title }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-danger me-2"
-                                    @click="removeFromFavorites(item.book.bookId)">Remove</button>
-                                <button class="btn btn-sm btn-outline-primary"
-                                    @click="borrowFavoriteBook(BORROW_STATUS_RESERVED, item.bookId)"
-                                    v-if="item.isBorrowable">Borrow</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p v-else class="text-muted justify-content-center align-items-center text-center">No favorite books</p>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex flex-column flex-sm-row gap-1 gap-sm-2 justify-content-end">
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            @click="removeFromFavorites(item.book.bookId)">Remove</button>
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            @click="borrowFavoriteBook(BORROW_STATUS_RESERVED, item.bookId)"
+                                            v-if="item.isBorrowable">Borrow</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p v-else class="text-muted text-center py-3 mb-0">No favorite books</p>
             </section>
         </div>
     </div>
@@ -260,3 +272,45 @@ const removeFromFavorites = (bookId) => {
 
 
 </script>
+
+<style scoped>
+.user-books {
+    padding: 20px;
+}
+
+.header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+@media (max-width: 767px) {
+    .user-books {
+        padding: 15px;
+    }
+
+    .header {
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        margin-bottom: 20px !important;
+        padding: 15px !important;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .table td {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .table th {
+        padding: 0.5rem 0.25rem;
+    }
+}
+</style>

@@ -2,13 +2,9 @@
   <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-md-10">
-        <div class="card shadow d-flex flex-row">
-          <img
-            src="@/assets/register.jpg"
-            class="card-img-left img-fluid"
-            style="width: 50%; object-fit: cover"
-          />
-          <div class="card-body p-5" style="width: 50%">
+        <div class="card shadow signup-card overflow-hidden">
+          <img src="@/assets/register.jpg" class="card-img-left img-fluid" />
+          <div class="card-body p-4 p-md-5">
             <h2 class="text-center mb-4">Sign Up</h2>
 
             <form @submit.prevent="onSignUpSubmit">
@@ -24,12 +20,7 @@
 
               <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  v-model="formObj.password"
-                  id="password"
-                />
+                <input type="password" class="form-control" v-model="formObj.password" id="password" />
               </div>
 
               <div class="alert alert-danger" v-if="errorList.length > 0">
@@ -43,9 +34,7 @@
             </form>
 
             <div class="text-center mt-3">
-              <router-link :to="{ name: APP_ROUTE_NAMES.SIGN_IN }"
-                >Already have an account? Login</router-link
-              >
+              <router-link :to="{ name: APP_ROUTE_NAMES.SIGN_IN }">Already have an account? Login</router-link>
             </div>
           </div>
         </div>
@@ -106,3 +95,29 @@ const onSignUpSubmit = async () => {
   }
 }
 </script>
+<style scoped>
+.signup-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-card .card-img-left {
+  width: 100%;
+  object-fit: cover;
+}
+
+.signup-card .card-body {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .signup-card {
+    flex-direction: row;
+  }
+
+  .signup-card .card-img-left,
+  .signup-card .card-body {
+    width: 50%;
+  }
+}
+</style>

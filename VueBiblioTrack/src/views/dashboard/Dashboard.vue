@@ -1,30 +1,26 @@
 <template>
-    <div class="container px-3" v-if="!authStore.isAdmin">
+    <div class="container-fluid px-3" v-if="!authStore.isAdmin">
         <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
             <div class="spinner-grow text-primary-subtle" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
         <div class="dashboard" v-else>
-
-            <!-- APP TITLE / BRAND -->
             <section class="app-header">
                 <div class="title-group d-flex flex-column">
                     <h1 class="app-title">BiblioTrack: </h1>
                     <p>From shelf to reader, made simple.</p>
                 </div>
             </section>
-
-            <!-- RIGHT: FEATURE CARD -->
-            <section class="features d-flex gap-3 mb-5">
+            <section class="features">
 
                 <div v-for="card in featuredCards" :key="card.id" class="feature-card">
-                    <span :class="card.icon"></span>
-                    <h4>{{ card.title }}</h4>
-                    <p>{{ card.description }}</p>
+                    
+                    <h4><span :class="card.icon"></span> &nbsp; {{ card.title }}</h4>
+                    <p class="features-description">{{ card.description }}</p>
                 </div>
             </section>
-            <section class="hero flex-fill" v-if="stats.bookOfTheDay">
+            <section class="hero flex" v-if="stats.bookOfTheDay">
                 <img :src="stats.bookOfTheDay.imageUrl" class="hero-cover"
                     @click="showBookDetails(stats.bookOfTheDay.bookId)" style="cursor:pointer;" />
                 <div class="hero-info">
@@ -36,9 +32,6 @@
                     </p>
                 </div>
             </section>
-
-
-            <!-- TRENDING BOOKS (NETFLIX STYLE ROW) -->
             <section class="book-row mb-5" v-if="stats.trendingBooks.length > 0">
                 <h3><i class="bi bi-fire"></i> Trending</h3>
 
@@ -53,9 +46,6 @@
                     </div>
                 </div>
             </section>
-
-
-            <!-- RECENT BOOKS -->
             <section class="book-row">
                 <h3><i class="bi bi-clock"></i> Recently Added</h3>
 
@@ -70,9 +60,6 @@
                     </div>
                 </div>
             </section>
-
-
-            <!-- STATS -->
             <section class="stats">
                 <div class="stat-card">
                     <h2>{{ stats.bookCount }}</h2>
@@ -99,7 +86,7 @@
                 @close="closeModal" />
         </div>
     </div>
-    <div class="container px-3" v-else>
+    <div class="container-fluid px-3" v-else>
         <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
             <div class="spinner-grow text-primary-subtle" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -116,13 +103,13 @@
             </section>
 
 
-            <section class="features d-flex gap-3 mb-5">
+            <section class="features">
 
                 <div v-for="card in featuredCardsAdmin" :key="card.id" class="feature-card">
                     <div @click="router.push({ name: card.linkTo })" style="cursor:pointer;">
                         <span :class="card.icon"></span>
                         <h4>{{ card.title }}</h4>
-                        <p>{{ card.description }}</p>
+                        <p class="features-description">{{ card.description }}</p>
                     </div>
                 </div>
             </section>
@@ -382,10 +369,8 @@ const removeFromFavorites = (bookId, selectedBook) => {
 .features {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    max-height: 2000px;
     gap: 20px;
     margin-bottom: 50px;
-    padding: 10px;
 }
 
 .feature-card {
@@ -398,8 +383,9 @@ const removeFromFavorites = (bookId, selectedBook) => {
 .feature-card span {
     font-size: 28px;
 }
-
-/* STATS */
+.features-description {
+    display: block;
+}
 
 .stats {
     display: grid;
@@ -460,5 +446,71 @@ const removeFromFavorites = (bookId, selectedBook) => {
 
 .author {
     font-size: 12px;
+}
+
+@media (max-width: 991px) {
+    .dashboard {
+        padding: 24px;
+    }
+
+    .features,
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    .hero-cover {
+        width: 50%;
+        max-width: 50%;
+        height: auto;
+    }
+
+    .hero-info h1 {
+        font-size: 28px;
+    }
+
+    .description {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .dashboard {
+        padding: 16px;
+    }
+
+    .features,
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+
+
+    .feature-card,
+    .stat-card {
+        padding: 18px;
+    }
+
+    .features-description {
+        display: none;
+    }
+
+    .scroll-row {
+        gap: 12px;
+        padding-top: 8px;
+    }
+
+    .book-card {
+        min-width: 120px;
+    }
+
+    .hero-info h1 {
+        font-size: 24px;
+    }
 }
 </style>
