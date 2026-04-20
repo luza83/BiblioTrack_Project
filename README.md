@@ -8,6 +8,11 @@ Built with Vue.js and connected to a .NET REST API.
 ---
 
 ## Live Demo
+https://biblio-track-tau.vercel.app/
+
+<img width="300" height="200" alt="Screenshot 2026-04-19 at 09 16 33" src="https://github.com/user-attachments/assets/0d1a7d1d-a440-4af8-b919-dc8917d3ae71" />
+<img width="300" height="200" alt="Screenshot 2026-04-19 at 09 15 40" src="https://github.com/user-attachments/assets/9f7b742b-b3d3-439d-8287-715e301e4ca6" />
+<img width="300" height="200" alt="Screenshot 2026-04-19 at 09 15 18" src="https://github.com/user-attachments/assets/c09f43a2-d6fc-4cf8-aa9a-82c283867328" />
 
 
 ---
