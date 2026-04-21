@@ -93,6 +93,7 @@ const loading = ref(false)
 const isProcessing = ref(false)
 const errorList = reactive([])
 const userIdForUpdate = route.params.userId
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{6,}$/
 const userObj = reactive({
     userName: '',
     password: '',
@@ -127,9 +128,14 @@ const onFormSubmit = async (event) => {
     if (userObj.email === undefined || userObj.email.length === 0) {
         errorList.push('Email is required.')
     }
-    if (userObj.resetPassword && (userObj.password === undefined || userObj.password.length === 0)) {
+    if (userObj.resetPassword && (userObj.password === undefined ||
+        userObj.password.length === 0)) {
         errorList.push('Password is required when resetting password.')
     }
+    if(userObj.password && passwordRegex.test(userObj.password) === false) {
+        errorList.push('Password must be at least 6 characters long and include uppercase, lowercase, number, and special character.')
+    }
+
     if (errorList.length > 0) {
         loading.value = false
         return
@@ -168,6 +174,13 @@ const onFormSubmit = async (event) => {
                 showSuccess('User registered successfully!')
                 isProcessing.value = false;
                 router.push({ name: APP_ROUTE_NAMES.USERS })
+            }
+            else {
+                if (response.message !== undefined) {
+                    response.message.split('--').forEach((error) => {
+                        errorList.push(error)
+                    })
+                }
             }
 
         } catch (err) {
