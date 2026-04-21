@@ -1,2 +1,1 @@
-export const CONFIG_API_URL = 'https://bibliotrackapi.azurewebsites.net/api'
-//export const CONFIG_API_URL = 'https://localhost:7232/api'
+export const CONFIG_API_URL = import.meta.env.VITE_API_URL 
