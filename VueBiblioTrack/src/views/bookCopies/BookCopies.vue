@@ -129,7 +129,6 @@ onMounted(() => {
 const handleBookCopyDelete = async (copyId) => {
   try {
     const confirmResult = await showConfirm('Are you sure you want to delete this copy?')
-    console.log(confirmResult)
     if (confirmResult.isConfirmed) {
       loading.value = true
       await bookCopyService.deleteBookCopy(copyId)

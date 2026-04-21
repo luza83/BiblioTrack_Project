@@ -78,15 +78,12 @@ const onSignUpSubmit = async () => {
 
   try {
     const response = await authStore.signUp(formObj)
-    console.log(response)
-    if (response.success) {
-      console.log('success')
-    } else {
+    if (!response.success) {
       if (response.message !== undefined) {
-        response.message.split('--').forEach((error) => {
-          errorList.push(error)
-        })
-      }
+          response.message.split('--').forEach((error) => {
+            errorList.push(error)
+          })
+        }
     }
   } catch (err) {
     errorList.push(err)

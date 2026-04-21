@@ -177,7 +177,6 @@ const updateBookCopy = async () => {
   }
 
   if (Object.keys(payload).length === 0) {
-    // nothing changed
     closeModal()
     return
   }

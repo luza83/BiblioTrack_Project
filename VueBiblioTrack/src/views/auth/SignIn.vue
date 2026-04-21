@@ -79,7 +79,6 @@ const onSignInSubmit = async () => {
 
   try {
     const response = await authStore.signIn(formObj)
-    console.log(response)
     if (response.message !== undefined) {
         response.message.split('--').forEach((error) => {
           errorList.push(error)
