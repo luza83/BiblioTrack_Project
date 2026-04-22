@@ -62,7 +62,7 @@
                 style="height: 200px; cursor: pointer;" />
               <div class="position-absolute top-0 end-0 m-2" v-if="book.totalCopies > 0">
                 <button class="btn btn-sm btn-primary" type="button" @click="borrowBook(book)">
-                   Borrow
+                   Reserve
                 </button>
               </div>
             </div>
