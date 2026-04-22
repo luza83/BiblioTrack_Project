@@ -43,8 +43,9 @@
                 </div>
                 <div class="mb-3" v-if="!userIdForUpdate">
                     <label for="role" class="form-label">Role</label>
-                    <select class="form-select" id="role" v-model="userObj.role">
-                        <option v-for="role in ROLES" :key="role">{{ role }}</option>
+                    <select class="form-select" id="role" v-model="userObj.role" >
+                        <option v-if="authStore.isDemo" value="Visitor">Visitor</option>
+                        <option v-else v-for="role in ROLES" :key="role">{{ role }}</option>
                     </select>
                 </div>
                 <div v-if="userIdForUpdate">
@@ -85,7 +86,9 @@ import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import { ROLES } from '@/constants/constants'
 import usersService from '@/services/usersService'
 import { useSwal } from '@/composables/swal'
-
+import { useAuthStore } from '@/stores/authStore'
+const authStore = useAuthStore()
+console.log('Auth Store in UserUpsert:', authStore.isDemo)
 const { showError, showSuccess, showConfirm } = useSwal()
 const router = new useRouter()
 const route = new useRoute()
@@ -131,6 +134,9 @@ const onFormSubmit = async (event) => {
     if (userObj.resetPassword && (userObj.password === undefined ||
         userObj.password.length === 0)) {
         errorList.push('Password is required when resetting password.')
+    }
+    if(userObj.resetPassword && authStore.isDemo){
+        errorList.push('Password reset is not allowed for demo admin.')
     }
     if(userObj.password && passwordRegex.test(userObj.password) === false) {
         errorList.push('Password must be at least 6 characters long and include uppercase, lowercase, number, and special character.')

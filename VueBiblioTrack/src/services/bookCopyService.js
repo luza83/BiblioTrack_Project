@@ -1,4 +1,5 @@
 import api from '@/services/api'
+import { useAuthStore } from '@/stores/authStore'
 
 export default {
 
@@ -31,6 +32,11 @@ export default {
     }
   },
   async addBookCopy(data) {
+    const authStore = useAuthStore();
+    if (authStore.isAdmin && authStore.isDemo) {
+      alert('Unauthorized: Demo admin can not add book copies')
+      throw new Error('Unauthorized: Demo admin can not add book copies')
+    }
     try {
       const response = await api.post('/bookCopies', data)
 
@@ -59,9 +65,14 @@ export default {
     }
   },
   async deleteBookCopy(bookCopyId) {
+    const authStore = useAuthStore();
+    if (authStore.isAdmin && authStore.isDemo) {
+      alert('Unauthorized: Demo admin can not delete book copies')
+      throw new Error('Unauthorized: Demo admin can not delete book copies')
+    }
     try {
       const response = await api.delete(`/bookCopies?bookCopyId=${bookCopyId}`)
-      
+
       if (response.data.isSuccess) {
         return response.data.result
       } else {

@@ -24,6 +24,9 @@ export const useAuthStore = defineStore('authStore', () => {
   const isAdmin = computed(() => {
     return isAuthenticated.value && user.role === 'Admin'
   })
+  const isDemo = computed(() => {
+    return isAdmin.value && user.email === 'demoAdmin@domain.com'
+  })
 
   const currentUserId = computed(() => {
     return isAuthenticated.value ? user.id : null
@@ -118,6 +121,7 @@ export const useAuthStore = defineStore('authStore', () => {
     isAuthenticated,
     getUserInfo,
     isAdmin,
+    isDemo,
     signUp,
     signIn,
     initialize,
