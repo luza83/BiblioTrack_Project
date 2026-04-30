@@ -255,7 +255,7 @@ const fetchDashboardData = async (retryCount = 0) => {
 
     } catch (error) {
         if (retryCount < MAX_RETRIES) {
-            await new Promise(resolve => setTimeout(resolve, 8000));
+            await new Promise(resolve => setTimeout(resolve, 10000));
 
             return fetchDashboardData(retryCount + 1);
         }
@@ -353,7 +353,7 @@ const rotateMessages = () => {
         } else {
             loadingMessage.value = messages[messageIndex];
         }
-    }, 1500);
+    }, 3000);
 };
 </script>
 
