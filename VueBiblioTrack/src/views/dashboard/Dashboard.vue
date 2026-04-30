@@ -230,21 +230,28 @@ let userFavoriteBookRequest = {
     bookId: null
 }
 
+const isValidDashboardData = (data) => {
+    return data &&
+        data.bookCount > 0 &&
+        data.trendingBooks?.length > 0 &&
+        data.newBooks?.length > 0 &&
+        data.bookOfTheDay;
+};
+
 const fetchDashboardData = async (retryCount = 0) => {
     const MAX_RETRIES = 5;
 
     try {
-        loading.value = true;
-
         if (retryCount === 0) {
+            loading.value = true;
             rotateMessages();
         }
 
         const data = await dashboardService.getDashboardData();
-        if (!data || !data.bookCount) {
-            throw new Error("Empty response");
-        }
 
+        if (!isValidDashboardData(data)) {
+            throw new Error("Invalid or incomplete data");
+        }
         stats.bookCount = data.bookCount;
         stats.borrowedBookCount = data.borrowedBookCount;
         stats.favoriteBookCount = data.favoriteBookCount;
@@ -253,17 +260,16 @@ const fetchDashboardData = async (retryCount = 0) => {
         stats.trendingBooks = data.trendingBooks;
         stats.newBooks = data.newBooks;
 
-    } catch (error) {
-        if (retryCount < MAX_RETRIES) {
-            await new Promise(resolve => setTimeout(resolve, 10000));
+        loading.value = false;
 
+    } catch (error) {
+
+        if (retryCount < MAX_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
             return fetchDashboardData(retryCount + 1);
         }
 
-    } finally {
-        if (retryCount === 0 || retryCount >= 5) {
-            loading.value = false;
-        }
+        loading.value = false;
     }
 };
 onMounted(() => {
@@ -571,4 +577,5 @@ const rotateMessages = () => {
     .hero-info h1 {
         font-size: 24px;
     }
-}</style>
+}
+</style>
