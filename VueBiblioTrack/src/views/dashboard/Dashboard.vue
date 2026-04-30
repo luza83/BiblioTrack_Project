@@ -231,7 +231,7 @@ let userFavoriteBookRequest = {
 }
 
 const fetchDashboardData = async (retryCount = 0) => {
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 5;
 
     try {
         loading.value = true;
@@ -261,7 +261,7 @@ const fetchDashboardData = async (retryCount = 0) => {
         }
 
     } finally {
-        if (retryCount === 0 || retryCount >= 3) {
+        if (retryCount === 0 || retryCount >= 5) {
             loading.value = false;
         }
     }
