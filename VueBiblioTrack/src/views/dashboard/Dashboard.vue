@@ -255,7 +255,7 @@ const fetchDashboardData = async (retryCount = 0) => {
 
     } catch (error) {
         if (retryCount < MAX_RETRIES) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, 8000));
 
             return fetchDashboardData(retryCount + 1);
         }
