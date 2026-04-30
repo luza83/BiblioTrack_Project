@@ -1,8 +1,14 @@
 <template>
     <div class="container-fluid px-3" v-if="!authStore.isAdmin">
-        <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
-            <div class="spinner-grow text-primary-subtle" role="status">
-                <span class="visually-hidden">Loading...</span>
+        <div v-if="loading" class="d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+            <div class="mb-3">
+                <div class="book-loader"></div>
+            </div>
+            <div>
+                <h5>{{ loadingMessage }}</h5>
+                <small class="text-muted">
+                    &nbsp; First load may take a few seconds (server waking up)
+                </small>
             </div>
         </div>
         <div class="dashboard" v-else>
@@ -15,7 +21,7 @@
             <section class="features">
 
                 <div v-for="card in featuredCards" :key="card.id" class="feature-card">
-                    
+
                     <h4><span :class="card.icon"></span> &nbsp; {{ card.title }}</h4>
                     <p class="features-description">{{ card.description }}</p>
                 </div>
@@ -223,26 +229,43 @@ let userFavoriteBookRequest = {
     userId: authStore.currentUserId,
     bookId: null
 }
-const fetchDashboardData = async () => {
-    try {
-        loading.value = true
-        await dashboardService.getDashboardData().then(data => {
 
-            stats.bookCount = data.bookCount
-            stats.borrowedBookCount = data.borrowedBookCount
-            stats.favoriteBookCount = data.favoriteBookCount
-            stats.reservedBookCount = data.reservedBookCount
-            stats.bookOfTheDay = data.bookOfTheDay
-            stats.trendingBooks = data.trendingBooks
-            stats.newBooks = data.newBooks
-        })
+const fetchDashboardData = async (retryCount = 0) => {
+    const MAX_RETRIES = 3;
+
+    try {
+        loading.value = true;
+
+        if (retryCount === 0) {
+            rotateMessages();
+        }
+
+        const data = await dashboardService.getDashboardData();
+        if (!data || !data.bookCount) {
+            throw new Error("Empty response");
+        }
+
+        stats.bookCount = data.bookCount;
+        stats.borrowedBookCount = data.borrowedBookCount;
+        stats.favoriteBookCount = data.favoriteBookCount;
+        stats.reservedBookCount = data.reservedBookCount;
+        stats.bookOfTheDay = data.bookOfTheDay;
+        stats.trendingBooks = data.trendingBooks;
+        stats.newBooks = data.newBooks;
 
     } catch (error) {
-        console.error('Error fetching dashboard data:', error)
+        if (retryCount < MAX_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            return fetchDashboardData(retryCount + 1);
+        }
+
     } finally {
-        loading.value = false
+        if (retryCount === 0 || retryCount >= 3) {
+            loading.value = false;
+        }
     }
-}
+};
 onMounted(() => {
     fetchDashboardData()
 })
@@ -311,6 +334,27 @@ const removeFromFavorites = (bookId, selectedBook) => {
         stats.newBooks.find(b => b.bookId === bookId).isUserFavorite = false
     }
 }
+const loadingMessage = ref("Waking up the library...");
+
+const messages = [
+    "Waking up the library...",
+    "Dusting off the books...",
+    "Calling the librarian...",
+    "Almost ready..."
+];
+
+let messageIndex = 0;
+
+const rotateMessages = () => {
+    const interval = setInterval(() => {
+        messageIndex++;
+        if (messageIndex >= messages.length) {
+            clearInterval(interval);
+        } else {
+            loadingMessage.value = messages[messageIndex];
+        }
+    }, 1500);
+};
 </script>
 
 <style scoped>
@@ -383,6 +427,7 @@ const removeFromFavorites = (bookId, selectedBook) => {
 .feature-card span {
     font-size: 28px;
 }
+
 .features-description {
     display: block;
 }
@@ -409,8 +454,6 @@ const removeFromFavorites = (bookId, selectedBook) => {
     font-weight: bold;
     font-size: 30px;
 }
-
-/* BOOK ROWS */
 
 .book-row {
     margin-bottom: 30px;
@@ -446,6 +489,22 @@ const removeFromFavorites = (bookId, selectedBook) => {
 
 .author {
     font-size: 12px;
+}
+
+.book-loader {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #ccc;
+    border-top: 4px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 991px) {
@@ -512,5 +571,4 @@ const removeFromFavorites = (bookId, selectedBook) => {
     .hero-info h1 {
         font-size: 24px;
     }
-}
-</style>
+}</style>
