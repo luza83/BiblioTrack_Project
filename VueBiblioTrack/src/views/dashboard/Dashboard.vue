@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid px-3" v-if="!authStore.isAdmin">
+    <div class="container-fluid ">
         <div v-if="loading" class="d-flex flex-column justify-content-center align-items-center vh-100 text-center">
             <div class="mb-3">
                 <div class="book-loader"></div>
@@ -18,15 +18,40 @@
                     <p>From shelf to reader, made simple.</p>
                 </div>
             </section>
-            <section class="features">
+            <section class="features" v-if="!authStore.isAdmin">
+                <div v-for="card in featuredCards" :key="card.title" class="col-12 col-sm-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="glow-blob"
+                            :style="{ background: `radial-gradient(circle at 30% 30%, ${card.color}33 0%, transparent 50%)` }">
+                            <div class="card-body-inner">
+                                <h4>
+                                    <span :class="card.icon" :style="{ color: card.color }"></span>
+                                    &nbsp;{{ card.title }}
+                                </h4>
+                                <p>{{ card.description }}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                <div v-for="card in featuredCards" :key="card.id" class="feature-card">
-
-                    <h4><span :class="card.icon"></span> &nbsp; {{ card.title }}</h4>
-                    <p class="features-description">{{ card.description }}</p>
                 </div>
             </section>
-            <section class="hero flex" v-if="stats.bookOfTheDay">
+            <section class="features" v-else>
+                <div v-for="card in featuredCardsAdmin" :key="card.title" class="col-12 col-sm-6 col-lg-4">
+                    <div class="feature-card" @click="router.push({ name: card.linkTo })" style="cursor:pointer;">
+                        <div class="glow-blob"
+                            :style="{ background: `radial-gradient(circle at 30% 30%, ${card.color}33 0%, transparent 50%)` }">
+                            <div class="card-body-inner">
+                                <h4>
+                                    <span :class="card.icon" :style="{ color: card.color }"></span>
+                                    &nbsp;{{ card.title }}
+                                </h4>
+                                <p>{{ card.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="hero flex" v-if="!authStore.isAdmin && stats.bookOfTheDay">
                 <img :src="stats.bookOfTheDay.imageUrl" class="hero-cover"
                     @click="showBookDetails(stats.bookOfTheDay.bookId)" style="cursor:pointer;" />
                 <div class="hero-info">
@@ -38,7 +63,7 @@
                     </p>
                 </div>
             </section>
-            <section class="book-row mb-5" v-if="stats.trendingBooks.length > 0">
+            <section class="book-row mb-5" v-if="!authStore.isAdmin && stats.trendingBooks.length > 0">
                 <h3><i class="bi bi-fire"></i> Trending</h3>
 
                 <div class="scroll-row">
@@ -52,7 +77,7 @@
                     </div>
                 </div>
             </section>
-            <section class="book-row">
+            <section class="book-row" v-if="!authStore.isAdmin">
                 <h3><i class="bi bi-clock"></i> Recently Added</h3>
 
                 <div class="scroll-row">
@@ -66,83 +91,69 @@
                     </div>
                 </div>
             </section>
-            <section class="stats">
-                <div class="stat-card">
-                    <h2>{{ stats.bookCount }}</h2>
-                    <p>Books in Library</p>
+            <section class="row g-3 my-3">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center gap-3 p-4">
+                            <div class="stat-icon-wrap bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+                                <i class="bi bi-journal-bookmark-fill fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="stat-value fw-bold fs-2 lh-1 mb-1">{{ stats.bookCount }}</div>
+                                <div class="stat-label text-muted small text-uppercase fw-semibold ls-1">Library Collection
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-accent bg-primary"></div>
+                    </div>
                 </div>
 
-                <div class="stat-card">
-                    <h2>{{ stats.borrowedBookCount }}</h2>
-                    <p>Total Borrows</p>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center gap-3 p-4">
+                            <div class="stat-icon-wrap bg-success bg-opacity-10 text-success rounded-3 p-3">
+                                <i class="bi bi-arrow-left-right fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="stat-value fw-bold fs-2 lh-1 mb-1">{{ stats.borrowedBookCount }}</div>
+                                <div class="stat-label text-muted small text-uppercase fw-semibold">Books Borrowed</div>
+                            </div>
+                        </div>
+                        <div class="stat-accent bg-success"></div>
+                    </div>
                 </div>
 
-                <div class="stat-card">
-                    <h2>{{ stats.favoriteBookCount }}</h2>
-                    <p>Favorites Saved</p>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center gap-3 p-4">
+                            <div class="stat-icon-wrap bg-danger bg-opacity-10 text-danger rounded-3 p-3">
+                                <i class="bi bi-heart-fill fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="stat-value fw-bold fs-2 lh-1 mb-1">{{ stats.favoriteBookCount }}</div>
+                                <div class="stat-label text-muted small text-uppercase fw-semibold">Reader Favorites</div>
+                            </div>
+                        </div>
+                        <div class="stat-accent bg-danger"></div>
+                    </div>
                 </div>
 
-                <div class="stat-card">
-                    <h2>{{ stats.reservedBookCount }}</h2>
-                    <p>Active Reservations</p>
-                </div>
-            </section>
-
-            <BookModal :show="showModal" :book-id="selectedBook" @borrow="borrowBook" @favorite="toggleFavorites"
-                @close="closeModal" />
-        </div>
-    </div>
-    <div class="container-fluid px-3" v-else>
-        <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
-            <div class="spinner-grow text-primary-subtle" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-        <div class="dashboard" v-else>
-
-
-            <section class="app-header">
-                <div class="title-group d-flex flex-column">
-                    <h1 class="app-title">BiblioTrack: </h1>
-                    <p>From shelf to reader, made simple.</p>
-                </div>
-            </section>
-
-
-            <section class="features">
-
-                <div v-for="card in featuredCardsAdmin" :key="card.id" class="feature-card">
-                    <div @click="router.push({ name: card.linkTo })" style="cursor:pointer;">
-                        <span :class="card.icon"></span>
-                        <h4>{{ card.title }}</h4>
-                        <p class="features-description">{{ card.description }}</p>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card stat-card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex align-items-center gap-3 p-4">
+                            <div class="stat-icon-wrap bg-warning bg-opacity-10 text-warning rounded-3 p-3">
+                                <i class="bi bi-bookmark-check-fill fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="stat-value fw-bold fs-2 lh-1 mb-1">{{ stats.reservedBookCount }}</div>
+                                <div class="stat-label text-muted small text-uppercase fw-semibold">Pending Reservations
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-accent bg-warning"></div>
                     </div>
                 </div>
             </section>
-
-            <!-- STATS ADMIN -->
-            <section class="stats">
-                <div class="stat-card">
-                    <h2>{{ stats.bookCount }}</h2>
-                    <p>Books in Library</p>
-                </div>
-
-                <div class="stat-card">
-                    <h2>{{ stats.borrowedBookCount }}</h2>
-                    <p>Total Borrows</p>
-                </div>
-
-                <div class="stat-card">
-                    <h2>{{ stats.favoriteBookCount }}</h2>
-                    <p>Favorites Saved</p>
-                </div>
-
-                <div class="stat-card">
-                    <h2>{{ stats.reservedBookCount }}</h2>
-                    <p>Active Reservations</p>
-                </div>
-            </section>
-
             <BookModal :show="showModal" :book-id="selectedBook" @borrow="borrowBook" @favorite="toggleFavorites"
                 @close="closeModal" />
         </div>
@@ -179,49 +190,57 @@ const selectedBook = ref(null)
 const showModal = ref(false)
 const featuredCards = [
     {
-        icon: 'bi bi-book bi-book-fill text-success',
+        icon: 'bi bi-book bi-book-fill',
         title: 'Borrow Books',
-        description: 'Reserve books online and pick them up in 2 hours.'
+        description: 'Reserve books online and pick them up in 2 hours.',
+        color: '#eab308'
     },
     {
-        icon: 'bi bi-heart bi-heart-fill text-danger',
+        icon: 'bi bi-heart bi-heart-fill',
         title: 'Save Favorites',
-        description: 'Create your personal reading list.'
+        description: 'Create your personal reading list.',
+        color: '#f97316'
     },
     {
-        icon: 'bi bi-bookmark bi-bookmark-fill text-primary',
+        icon: 'bi bi-bookmark bi-bookmark-fill',
         title: 'Manage Books',
-        description: 'Track borrowed books and returns.'
+        description: 'Track borrowed books and returns.',
+        color: '#22c55e'
     },
     {
-        icon: 'bi bi-clock bi-clock-fill text-warning',
+        icon: 'bi bi-clock bi-clock-fill',
         title: 'Quick Pickup',
-        description: 'Reserve and collect books easily.'
+        description: 'Reserve and collect books easily.',
+        color: '#a855f7'
     }
 ]
 const featuredCardsAdmin = [
     {
-        icon: 'bi bi-book bi-book-fill text-success',
+        icon: 'bi bi-book bi-book-fill',
         title: 'Manage Books',
         description: 'Add, delete or edit library books.',
+        color: '#eab308',
         linkTo: APP_ROUTE_NAMES.BOOKS
     },
     {
-        icon: 'bi bi-bookshelf bi-bookshelf-fill text-primary',
+        icon: 'bi bi-bookshelf bi-bookshelf-fill',
         title: 'Manage Book Stock',
         description: 'Add, delete or edit book copies.',
+        color: '#f97316',
         linkTo: APP_ROUTE_NAMES.BOOK_STOCK
     },
     {
-        icon: 'bi bi-person-vcard bi-person-vcard-fill text-danger',
+        icon: 'bi bi-person-vcard bi-person-vcard-fill',
         title: 'Manage User Books',
         description: 'Track user borrows, returns and favorites.',
+        color: '#22c55e',
         linkTo: APP_ROUTE_NAMES.USERS
     },
     {
-        icon: 'bi bi-person bi-person-fill text-danger',
+        icon: 'bi bi-person bi-person-fill',
         title: 'Manage Users',
         description: 'Add, delete or edit library users',
+        color: '#a855f7',
         linkTo: APP_ROUTE_NAMES.USERS
     }
 ]
@@ -368,6 +387,8 @@ const rotateMessages = () => {
     padding: 40px;
     max-width: 1400px;
     margin: auto;
+    align-items: center;
+    justify-content: center;
 }
 
 /* HERO */
@@ -419,48 +440,82 @@ const rotateMessages = () => {
 .features {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 50px;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .feature-card {
-    border: 1px solid #4f5051;
-    border-style: double;
-    padding: 20px;
-    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2%;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    transition: background 0.2s ease;
+    min-height: 180px;
+    min-width: 280px;
+
 }
 
-.feature-card span {
-    font-size: 28px;
+.glow-blob {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 1rem;
+    align-items: center;
+    justify-content: center;
+    padding: 10%;
 }
 
-.features-description {
-    display: block;
+.icon-wrap {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+    font-size: large;
 }
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 50px;
+.card-body-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .stat-card {
-    background: transparent;
-    padding: 25px;
-    border: 1px solid #4f5051;
-    border-radius: 10px;
-    text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
 }
 
-
-.stat-card h2 {
-    color: #dee5f9;
-    text-shadow: 2px 2px 2px #0842987b;
-    font-weight: bold;
-    font-size: 30px;
+.stat-icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
 }
 
+.stat-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  letter-spacing: 0.04em;
+}
 .book-row {
     margin-bottom: 30px;
 }
@@ -554,15 +609,18 @@ const rotateMessages = () => {
         grid-template-columns: 1fr;
     }
 
-
-
     .feature-card,
     .stat-card {
         padding: 18px;
+        min-height: 150px;
     }
 
-    .features-description {
-        display: none;
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .card-desc {
+        font-size: 0.75rem;
     }
 
     .scroll-row {
