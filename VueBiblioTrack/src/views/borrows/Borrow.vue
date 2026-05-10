@@ -68,7 +68,7 @@
             </div>
 
             <div class="card-body" >
-              <div class="position-absolute bottom-0 end-0 m-2">
+              <div class="position-absolute bottom-0 end-0 m-2" v-if="authStore.isAuthenticated">
                 <i :class="book.isUserFavorite ? 'bi bi-heart-fill fs-5 text-danger' : 'bi bi-heart fs-5 text-muted'"
                   :id="'favoritesBtn' + book.bookId.toString()" title="Add to favorites" @click="toggleFavorites(book)"
                   style="cursor: pointer"></i>
@@ -128,6 +128,10 @@ import { useAuthStore } from "@/stores/authStore";
 import { ref, onMounted, reactive } from 'vue'
 import { BORROW_DUE_DATE, READY_FOR_PICKUP_TIME } from '@/constants/constants'
 import { useSwal } from '@/composables/swal'
+import { useRouter, useRoute } from 'vue-router';
+import { APP_ROUTE_NAMES } from '@/constants/routeNames'
+const router = useRouter()
+const route = useRoute()
 const { showError, showBorrowed } = useSwal()
 const availableBooks = reactive([])
 const loading = ref(false)
@@ -181,6 +185,14 @@ const fetchAvailableBooks = async () => {
 onMounted(fetchAvailableBooks)
 
 const borrowBook = async (book) => {
+  if (!authStore.isAuthenticated) {
+        router.push({
+            path: APP_ROUTE_NAMES.SIGN_IN,
+            query: { redirect: route.fullPath }
+        })
+
+        return
+    }
   try {
     loading.value = true
     let request = {

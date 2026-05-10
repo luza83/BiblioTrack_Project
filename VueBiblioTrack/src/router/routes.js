@@ -94,7 +94,6 @@ const router = createRouter({
       path: '/borrow-book',
       name: APP_ROUTE_NAMES.BORROW_BOOK,
       component: Borrow,
-      beforeEnter: [requireAuth],
     },
     {
       path: '/my-books',
