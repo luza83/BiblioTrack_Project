@@ -6,9 +6,6 @@
             </div>
             <div>
                 <h5>{{ loadingMessage }}</h5>
-                <small class="text-muted">
-                    &nbsp; First load may take a few seconds (server waking up)
-                </small>
             </div>
         </div>
         <div class="dashboard" v-else>
@@ -177,6 +174,7 @@ const route = useRoute();
 const { showError, showBorrowed } = useSwal()
 const authStore = useAuthStore();
 const loading = ref();
+const loadingMessage = ref("LibraTrack Waking Up...");
 const stats = reactive({
     bookCount: 0,
     borrowedBookCount: 0,
@@ -249,28 +247,17 @@ let userFavoriteBookRequest = {
     bookId: null
 }
 
-const isValidDashboardData = (data) => {
-    return data &&
-        data.bookCount > 0 &&
-        data.trendingBooks?.length > 0 &&
-        data.newBooks?.length > 0 &&
-        data.bookOfTheDay;
-};
-
 const fetchDashboardData = async (retryCount = 0) => {
-    const MAX_RETRIES = 5;
-
+    const messageTimeouts = messages.map(message =>
+        setTimeout(() => {
+            loadingMessage.value = message.text;
+        }, message.time)
+    );
     try {
-        if (retryCount === 0) {
-            loading.value = true;
-            rotateMessages();
-        }
 
+        loading.value = true;
         const data = await dashboardService.getDashboardData();
 
-        if (!isValidDashboardData(data)) {
-            throw new Error("Invalid or incomplete data");
-        }
         stats.bookCount = data.bookCount;
         stats.borrowedBookCount = data.borrowedBookCount;
         stats.favoriteBookCount = data.favoriteBookCount;
@@ -278,18 +265,14 @@ const fetchDashboardData = async (retryCount = 0) => {
         stats.bookOfTheDay = data.bookOfTheDay;
         stats.trendingBooks = data.trendingBooks;
         stats.newBooks = data.newBooks;
-
-        loading.value = false;
-
     } catch (error) {
-
-        if (retryCount < MAX_RETRIES) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            return fetchDashboardData(retryCount + 1);
-        }
-
+        errorMessage.value =
+            "The server is waking up. Please try again in a few seconds.";
+    } finally {
+        messageTimeouts.forEach(clearTimeout);
         loading.value = false;
     }
+
 };
 onMounted(() => {
     fetchDashboardData()
@@ -359,27 +342,14 @@ const removeFromFavorites = (bookId, selectedBook) => {
         stats.newBooks.find(b => b.bookId === bookId).isUserFavorite = false
     }
 }
-const loadingMessage = ref("Waking up the library...");
 
 const messages = [
-    "Waking up the library...",
-    "Dusting off the books...",
-    "Calling the librarian...",
-    "Almost ready..."
+    { time: 0, text: "Opening the library..." },
+    { time: 2000, text: "Organizing the shelves..." },
+    { time: 4000, text: "Gathering books..." },
+    { time: 6000, text: "Almost ready..." }
 ];
 
-let messageIndex = 0;
-
-const rotateMessages = () => {
-    const interval = setInterval(() => {
-        messageIndex++;
-        if (messageIndex >= messages.length) {
-            clearInterval(interval);
-        } else {
-            loadingMessage.value = messages[messageIndex];
-        }
-    }, 3000);
-};
 </script>
 
 <style scoped>
@@ -488,34 +458,36 @@ const rotateMessages = () => {
 }
 
 .stat-card {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .stat-accent {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
 }
 
 .stat-icon-wrap {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
 }
 
 .stat-value {
-  font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
-  letter-spacing: 0.04em;
+    letter-spacing: 0.04em;
 }
+
 .book-row {
     margin-bottom: 30px;
 }
