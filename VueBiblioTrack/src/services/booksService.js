@@ -120,6 +120,20 @@ export default {
       console.error('Error fetching book:', error)
       throw error
     }
+  },
+  async rateBook(data) {
+  try {
+    const response = await api.put('/books/rate', data)
+
+    if (response.data.isSuccess) {
+      return true;
+    } else {
+      throw new Error('Failed to update book')
+    }
+  } catch (error) {
+    console.error('Error updating book:', error)
+    throw error
   }
+  },
 
 }

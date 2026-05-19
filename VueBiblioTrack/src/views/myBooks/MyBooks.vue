@@ -36,10 +36,12 @@
                                     </div>
                                 </td>
                                 <td class="small">{{ formatDate(item.borrowDate) }}</td>
-                                <td class="small" :class="item.isOverdue ? 'text-danger' : ''">{{ item.isOverdue ? formatDate(item.dueDate) + ' ⚠' : formatDate(item.dueDate) }}</td>
+                                <td class="small" :class="item.isOverdue ? 'text-danger' : ''">{{ item.isOverdue ?
+                                    formatDate(item.dueDate) + ' ⚠' : formatDate(item.dueDate) }}</td>
                                 <td class="text-end">
                                     <div class="d-flex flex-column flex-sm-row gap-1 gap-sm-2 justify-content-end">
-                                        <button class="btn btn-sm btn-outline-primary" v-if="!item.isOverdue && renewable(item)"
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            v-if="!item.isOverdue && renewable(item)"
                                             @click="updateUserBook(BORROW_STATUS_BORROWED, item, true)">Renew</button>
                                         <button class="btn btn-sm btn-outline-danger"
                                             @click="updateUserBook(BORROW_STATUS_RETURNED, item, false)">Return</button>
@@ -130,6 +132,7 @@
                 <p v-else class="text-muted text-center py-3 mb-0">No favorite books</p>
             </section>
         </div>
+        <RateBookOnReturnModal :show="showRateModal" :book="selectedBorrowedBook" @close="closeModal" @rate="rateBook" />
     </div>
 </template>
 <script setup>
@@ -144,12 +147,16 @@ import {
     BORROW_STATUS_RETURNED,
     MINIMUM_DAYS_FOR_RENEW
 } from '@/constants/constants'
+import RateBookOnReturnModal from '@/components/modals/RateBookOnReturnModal.vue'
 import borrowBookService from '@/services/borrowBookService.js'
+import bookService from '@/services/booksService.js'
 import userFavoritesService from '@/services/userFavoritesService.js'
 import { useSwal } from '@/composables/swal'
 import moment from 'moment';
+import { useAuthStore } from '@/stores/authStore.js'
+const authStore = useAuthStore()
 
-const { showConfirm, showError, showSuccess, showConfirmBorrowStatus,showBorrowed } = useSwal();
+const { showConfirm, showError, showSuccess, showConfirmBorrowStatus, showBorrowed } = useSwal();
 const loading = ref(true);
 const updateUserBookRequest = reactive({
     borrowId: null,
@@ -170,6 +177,9 @@ const formatDate = (date) => {
 onMounted(() => {
     fetchMyBooks();
 });
+const selectedBorrowedBook = reactive({});
+const showRateModal = ref(false);
+const isRated = ref(false);
 
 const fetchMyBooks = async () => {
     try {
@@ -184,43 +194,45 @@ const fetchMyBooks = async () => {
         loading.value = false;
     }
 };
-const renewable = (borrow) =>{
-      if (!borrow?.dueDate) return false;
+const renewable = (borrow) => {
+    if (!borrow?.dueDate) return false;
 
     const diffDays = moment(borrow.dueDate).diff(moment(), 'days');
 
     return diffDays <= MINIMUM_DAYS_FOR_RENEW && diffDays >= 0;
 }
 const updateUserBook = async (newStatus, borrow, renew = false) => {
+    selectedBorrowedBook.value = borrow.book
     try {
         if (borrow.status != newStatus || renew) {
             updateUserBookRequest.borrowId = borrow.borrowId
-            let successTxt = 'Book updated successfully!'
+            let successTxt = 'Book status updated successfully!'
             if (borrow.isOverdue) {
                 successTxt = 'Returned overdue book successfully! You will receive a notification if there are any fines to be paid.'
             }
             if (renew && !borrow.isOverdue) {
                 successTxt = 'Book renewed successfully! New due date is in 7 days.'
                 updateUserBookRequest.dueDate = new Date(new Date().setDate(new Date().getDate() + BORROW_RENEWAL_DAYS));
-            }else{
+            } else {
                 updateUserBookRequest.dueDate = borrow.dueDate
             }
-            
-            updateUserBookRequest.newBorrowStatus = newStatus
 
+            updateUserBookRequest.newBorrowStatus = newStatus
 
             const response = await borrowBookService.updateBorrowingStatus(updateUserBookRequest);
             if (!response) {
                 showError(response.message || 'Failed to update user book.')
-            } else {
-
-                showBorrowed(successTxt)
-                fetchMyBooks();
-                updateUserBookRequest.borrowId = null
-                updateUserBookRequest.dueDate = null
-                updateUserBookRequest.newBorrowStatus = null
             }
-
+            updateUserBookRequest.borrowId = null
+            updateUserBookRequest.dueDate = null
+            updateUserBookRequest.newBorrowStatus = null
+            if(borrow.status === BORROW_STATUS_BORROWED && newStatus === BORROW_STATUS_RETURNED && !isRated.value ){
+                 showRateModal.value = true;
+                 successTxt = 'Book returned successfully! Please consider rating this book.'
+            }
+            showBorrowed(successTxt)
+            fetchMyBooks();
+            
         }
     }
     catch (error) {
@@ -246,8 +258,8 @@ const borrowFavoriteBook = async (borrowStatus, bookId) => {
             updateUserBookRequest.borrowId = response.borrowId
             updateUserBookRequest.dueDate = response.dueDate
             updateUserBookRequest.newBorrowStatus = BORROW_STATUS_BORROWED
-        
-            await borrowBookService.updateBorrowingStatus( updateUserBookRequest)
+
+            await borrowBookService.updateBorrowingStatus(updateUserBookRequest)
         })
         fetchMyBooks()
         updateUserBookRequest.borrowId = null
@@ -270,6 +282,25 @@ const removeFromFavorites = (bookId) => {
     }
 }
 
+const closeModal = () => {
+    showRateModal.value = false
+}
+const rateBook = async (bookId, rating) => {
+    let request = {
+        userId: authStore.currentUserId,
+        bookId: bookId,
+        rating: rating
+    }
+    try {
+        await bookService.rateBook(request)
+        showSuccess('Thank you for rating this book!')
+        isRated.value = true
+        showRateModal.value = false
+    } catch (error) {
+        console.error('Error rating book:', error)
+        showError('Failed to submit your rating. Please try again later.')
+    }
+}
 
 </script>
 
