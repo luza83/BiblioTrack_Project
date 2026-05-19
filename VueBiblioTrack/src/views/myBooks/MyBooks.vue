@@ -179,7 +179,6 @@ onMounted(() => {
 });
 const selectedBorrowedBook = reactive({});
 const showRateModal = ref(false);
-const isRated = ref(false);
 
 const fetchMyBooks = async () => {
     try {
@@ -226,7 +225,7 @@ const updateUserBook = async (newStatus, borrow, renew = false) => {
             updateUserBookRequest.borrowId = null
             updateUserBookRequest.dueDate = null
             updateUserBookRequest.newBorrowStatus = null
-            if(borrow.status === BORROW_STATUS_BORROWED && newStatus === BORROW_STATUS_RETURNED && !isRated.value ){
+            if(borrow.status === BORROW_STATUS_BORROWED && newStatus === BORROW_STATUS_RETURNED){
                  showRateModal.value = true;
                  successTxt = 'Book returned successfully! Please consider rating this book.'
             }
@@ -294,7 +293,6 @@ const rateBook = async (bookId, rating) => {
     try {
         await bookService.rateBook(request)
         showSuccess('Thank you for rating this book!')
-        isRated.value = true
         showRateModal.value = false
     } catch (error) {
         console.error('Error rating book:', error)
