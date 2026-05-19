@@ -143,7 +143,7 @@
                             </div>
                             <div>
                                 <div class="stat-value fw-bold fs-2 lh-1 mb-1">{{ stats.reservedBookCount }}</div>
-                                <div class="stat-label text-muted small text-uppercase fw-semibold">Pending Reservations
+                                <div class="stat-label text-muted small text-uppercase fw-semibold">Book Reservations
                                 </div>
                             </div>
                         </div>
