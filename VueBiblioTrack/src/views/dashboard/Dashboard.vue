@@ -304,7 +304,7 @@ const borrowBook = async (book) => {
             showError(response.message || 'Failed to borrow book.')
         }
         showBorrowed(`${book.title} is now reserved and will be ready to pick up in ${READY_FOR_PICKUP_TIME} hours \u{1F4D6}\u{1F60A} \nReturn by \n` + BORROW_DUE_DATE)
-
+        showModal.value = false;
     } catch (error) {
         console.log('Error borrowing book:', error)
     } finally {
