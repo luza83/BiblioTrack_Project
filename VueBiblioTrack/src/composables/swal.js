@@ -49,7 +49,6 @@ export function useSwal() {
     return await showAlert({
       position: 'top-end',
       width: '400px',
-      height: 'auto',
       icon: 'success',
       theme: themeStore.theme,
       backdrop: backdropColor,
